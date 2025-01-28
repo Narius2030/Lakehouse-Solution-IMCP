@@ -1,0 +1,6 @@
+cryptography
+boto3
+mlflow
+pymysql
+pandas
+scikit-learn
