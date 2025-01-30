@@ -42,22 +42,17 @@ services:
     networks:
       - data_network
 
-  postgres-16:
-    image: postgres:16
-    container_name: postgres-16
-    hostname: postgres-16
-    volumes:
-      - ./data/postgres_data:/var/lib/postgresql/data
-      - ./pg_hba.conf:/tmp/pg_hba.conf
-      # - ./load_dataset:/tmp/load_dataset
-    command: ["postgres", "-c", "hba_file=/tmp/pg_hba.conf"]
-    expose:
-      - "5433"
+  trino:
+    image: trinodb/trino:latest
+    container_name: trino
     ports:
-      - "5433:5432"
-    env_file: .env
-    networks:
-      - data_network
+      - "8080:8080"
+    volumes:
+      - ./trino-config:/etc/trino
+    depends_on:
+      - mongodb
+    environment:
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=UTC"
 
   mlflow-mysql:
     image: mysql:8.0
@@ -95,22 +90,7 @@ services:
       - AWS_ACCESS_KEY_ID=minio
       - AWS_SECRET_ACCESS_KEY=minio123
     # environment:#   - MLFLOW_S3_ENDPOINT_URL=http://minio:9000/#   - AWS_ACCESS_KEY_ID=minio#   - AWS_SECRET_ACCESS_KEY=minio123
-    command: mlflow server --backend-store-uri mysql+pymysql://root:admin@mysql:3306/mlflowdb --default-artifact-root s3://mlflow/ --artifacts-destination s3://mlflow/ --host 0.0.0.0
-
-  redis:
-    image: redis:7.4.2
-    expose:
-      - "6279:6379"
-    command: [ "redis-server", "--requirepass", "$$REDIS_PASSWORD", "--maxmemory", "2gb", "--maxmemory-policy", "allkeys-lru", "--set-proc-title", "redis [processed-data]" ]
-    environment:
-      - REDIS_PASSWORD=redis123
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 30s
-      retries: 50
-      start_period: 30s
-    restart: always  
+    command: mlflow server --backend-store-uri mysql+pymysql://root:admin@mysql:3306/mlflowdb --default-artifact-root s3://mlflow/ --artifacts-destination s3://mlflow/ --host 0.0.0.0 
 
 networks:
   data_network:
