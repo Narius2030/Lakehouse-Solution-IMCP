@@ -1,7 +1,6 @@
 import sys
 sys.path.append("./work")
 
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from utils.schema import sample_schema
 

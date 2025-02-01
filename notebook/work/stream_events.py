@@ -6,7 +6,7 @@ from operators.streaming import SparkStreaming
 from utils.streaming_functions import process_stream
 from pyspark.sql.functions import col, lit, to_timestamp, split, size
 
-settings = get_settings
+settings = get_settings()
 TOPIC="minio-parquets"
 CHECKPOINT_PATH = "s3a://lakehouse/streaming/test/checkpoint_minio_parquets"
 
@@ -27,7 +27,7 @@ spark.streams.awaitAnyTermination()
 
 
 # df = spark.read.format("mongodb") \
-#             .option("spark.mongodb.read.connection.uri", settings.MONGO_ATLAS_PYTHON) \
+#             .option("spark.mongodb.read.connection.uri", settings.MONGODB_ATLAS_URI) \
 #             .option("spark.mongodb.read.database", "imcp") \
 #             .option("spark.mongodb.read.collection", "raw") \
 #             .load()
