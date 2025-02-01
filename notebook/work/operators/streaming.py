@@ -1,11 +1,9 @@
 import sys
 sys.path.append("./work")
 
-from utils.configuration import get_settings
 from pyspark.sql import SparkSession
 from threading import Lock
 
-settings = get_settings()
 
 class SparkStreaming():
     _instance = None
@@ -49,7 +47,7 @@ class SparkStreaming():
 
         read_stream = (spark.readStream
                             .format("kafka")
-                            .option("kafka.bootstrap.servers", f"{settings.KAFKA_ADDRESS}:{settings.KAFKA_PORT}")
+                            .option("kafka.bootstrap.servers", f"{kafka_address}:{kafka_port}")
                             .option("failOnDataLoss", False)
                             .option("startingOffsets", starting_offset)
                             .option("subscribe", topic)
