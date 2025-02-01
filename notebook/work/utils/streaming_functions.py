@@ -3,16 +3,12 @@ sys.path.append("./work")
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
-from schema import schema_taxi
+from utils.schema import sample_schema
 
 def process_stream(stream):
-	stream = stream \
-			.selectExpr("CAST(value AS STRING)") \
-			.select(from_json(col("value"), schema_taxi).alias("data"))
-
-	stream = stream \
-		.groupBy("data.pickup_location")\
-		.agg(avg("data.trip_distance").alias("avg_trip_distance"), avg("data.total_amount").alias("avg_total_amount"))
-
-	return stream
-                
+    value_schema = schema_of_json(sample_schema)
+    stream = stream \
+              .selectExpr("CAST(value AS STRING)") \
+              .select(from_json(col("value"), value_schema).alias("value"))
+    
+    return stream

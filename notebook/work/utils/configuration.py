@@ -11,6 +11,13 @@ load_dotenv(dotenv_path=env_path)
 
 
 class Settings(BaseSettings):
+    # MongoDB Atlas
+    MONGODB_ATLAS_URI:str = os.getenv('MONGO_ATLAS_PYTHON')
+    
+    # Kafka
+    KAFKA_ADDRESS:str = os.getenv('KAFKA_ADDRESS')
+    KAFKA_PORT:str = os.getenv('KAFKA_PORT')
+    
     # Postgresql
     DB_HOST:str = os.getenv('POSTGRES_HOST')
     DB_PORT:str = os.getenv('POSTGRES_PORT')

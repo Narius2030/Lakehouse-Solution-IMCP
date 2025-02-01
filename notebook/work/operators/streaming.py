@@ -1,6 +1,11 @@
+import sys
+sys.path.append("./work")
+
+from utils.configuration import get_settings
 from pyspark.sql import SparkSession
 from threading import Lock
 
+settings = get_settings()
 
 class SparkStreaming():
     _instance = None
@@ -18,7 +23,7 @@ class SparkStreaming():
                                 .config("hive.metastore.uris", "thrift://hive-metastore:9083") \
                                 .config('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider') \
                                 .config('spark.sql.warehouse.dir', f's3a://lakehouse/') \
-                                .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0') \
+                                .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0,org.mongodb.spark:mongo-spark-connector:10.0.2') \
                                 .enableHiveSupport() \
                                 .getOrCreate()
                                             
@@ -44,7 +49,7 @@ class SparkStreaming():
 
         read_stream = (spark.readStream
                             .format("kafka")
-                            .option("kafka.bootstrap.servers", f"{kafka_address}:{kafka_port}")
+                            .option("kafka.bootstrap.servers", f"{settings.KAFKA_ADDRESS}:{settings.KAFKA_PORT}")
                             .option("failOnDataLoss", False)
                             .option("startingOffsets", starting_offset)
                             .option("subscribe", topic)
@@ -53,7 +58,7 @@ class SparkStreaming():
         return read_stream
     
     @staticmethod
-    def create_file_write_stream(stream, storage_path, checkpoint_path, trigger="1 seconds", output_mode="complete", file_format="delta"):
+    def create_file_write_stream(stream, checkpoint_path, storage_path=None, trigger="1 seconds", output_mode="complete", file_format="delta"):
         """
         Write the stream back to a file store
 
@@ -74,8 +79,6 @@ class SparkStreaming():
 
         write_stream = (stream.writeStream
                             .format(file_format)
-                            .partitionBy("pickup_location")
-                            .option("path", storage_path)
                             .option("checkpointLocation", checkpoint_path)
                             .trigger(processingTime=trigger)
                             .outputMode(output_mode))
