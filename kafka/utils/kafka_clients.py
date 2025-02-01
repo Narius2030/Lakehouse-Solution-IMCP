@@ -2,7 +2,6 @@ import os
 from json import dumps
 from kafka import KafkaProducer
 from confluent_kafka import Consumer
-# from confluent_kafka.serialization import StringSerializer
 
 
 class Prod():

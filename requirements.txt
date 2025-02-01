@@ -15,5 +15,8 @@ ultralytics
 keras==3.3.3
 transformers
 opencv-python
-minio
+minio==7.1.16
 ijson
+pyspark==3.3.2
+kafka-python
+confluent-kafka
