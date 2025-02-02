@@ -1,27 +1,31 @@
 import yaml
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
+env_path = Path(".") / ".env"
+load_dotenv(dotenv_path=env_path)
 
 class Settings(BaseSettings):
     # MongoDB Atlas
-    MONGODB_ATLAS_URI:str = "mongodb+srv://nhanbuimongo:nhanbui@mongodb-cluster.eozg9.mongodb.net/?retryWrites=true&w=majority&appName=mongodb-cluster"
+    MONGODB_ATLAS_URI:str = os.getenv("MONGO_ATLAS_PYTHON")
     
     # Kafka
-    KAFKA_ADDRESS:str = "160.191.244.13"
-    KAFKA_PORT:str = "9092"
+    KAFKA_ADDRESS:str = os.getenv("KAFKA_ADDRESS")
+    KAFKA_PORT:str = os.getenv("KAFKA_PORT")
     
     # Postgresql
-    DB_HOST:str = "160.191.244.13"
-    DB_PORT:str = "9092"
-    DB_USER:str = "admin"
-    DB_PASSWORD:str = "admin"
+    DB_HOST:str = os.getenv("POSTGRES_HOST")
+    DB_PORT:str = os.getenv("POSTGRES_PORT")
+    DB_USER:str = os.getenv("POSTGRES_USER")
+    DB_PASSWORD:str = os.getenv("POSTGRES_PASSWORD")
     DB_URL:str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}"
     
     # MinIO
-    MINIO_ENDPOINT:str = "http://160.191.244.13:9000"
-    MINIO_ROOT_USER:str = "minio"
-    MINIO_ROOT_PASSWORD:str = "minio123"
+    MINIO_ENDPOINT:str = os.getenv("MINIO_ENDPOINT")
+    MINIO_ROOT_USER:str = os.getenv("MINIO_ROOT_USER")
+    MINIO_ROOT_PASSWORD:str = os.getenv("MINIO_ROOT_PASSWORD")
 
 
 def get_settings() -> Settings:
