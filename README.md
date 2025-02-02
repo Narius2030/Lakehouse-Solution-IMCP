@@ -9,3 +9,7 @@
 # Storage Structure
 
 ![image](https://github.com/user-attachments/assets/89c2aa4f-47a4-415e-a252-19f46bd7f3ef)
+
+# MLOps cycle
+
+![image](https://github.com/user-attachments/assets/bc2dcf43-91ad-4ddd-bc04-694c181e652a)
