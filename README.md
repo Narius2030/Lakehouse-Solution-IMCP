@@ -1,10 +1,10 @@
 # General Architecture
 
-![image](https://github.com/user-attachments/assets/22b0883c-0474-42fb-9e7f-09ccc62379e7)
+![image](https://github.com/user-attachments/assets/98ca988a-509c-477e-a30d-2ee204b1b3fc)
 
 # Detailed Architecture
 
-![image](https://github.com/user-attachments/assets/576c2b32-aafc-45f7-a45b-28a6122bd5e0)
+![image](https://github.com/user-attachments/assets/64b1f8b2-22ce-4cdd-ac63-c8855883fbe0)
 
 # Storage Structure
 
