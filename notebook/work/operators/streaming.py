@@ -1,8 +1,6 @@
 import sys
 sys.path.append("./work")
-
 from pyspark.sql import SparkSession
-from threading import Lock
 
 
 class SparkStreaming():
@@ -58,7 +56,7 @@ class SparkStreaming():
             stream : DataStreamReader
                 The data stream reader for your stream
             file_format : str
-                parquet, csv, orc etc
+                mongodb, delta, parquet, csv etc
             storage_path : str
                 The file output path
             checkpoint_path : str
