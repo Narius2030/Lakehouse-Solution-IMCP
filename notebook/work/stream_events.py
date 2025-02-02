@@ -1,7 +1,7 @@
 import sys
 sys.path.append("./work")
 
-from utils.configuration import get_settings
+from utils.config import get_settings
 from operators.streaming import SparkStreaming
 from utils.streaming_functions import process_stream
 from pyspark.sql.functions import col, lit, to_timestamp, split, size
