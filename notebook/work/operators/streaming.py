@@ -8,17 +8,17 @@ from threading import Lock
 class SparkStreaming():
     @staticmethod
     def get_instance(app_name:str, executor_memory:str="1g", partitions:str="200"):
-        spark = SparkSession.builder \
-                            .appName(app_name) \
-                            .master('spark://spark-master:7077') \
-                            .config("spark.executor.memory", executor_memory) \
-                            .config("spark.sql.shuffle.partitions", partitions) \
-                            .config("hive.metastore.uris", "thrift://hive-metastore:9083") \
-                            .config('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider') \
-                            .config('spark.sql.warehouse.dir', f's3a://lakehouse/') \
-                            .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0,org.mongodb.spark:mongo-spark-connector:10.0.2') \
-                            .enableHiveSupport() \
-                            .getOrCreate()                
+        spark = (SparkSession.builder
+                    .appName(app_name)
+                    .master('spark://spark-master:7077')
+                    .config("spark.executor.memory", executor_memory)
+                    .config("spark.sql.shuffle.partitions", partitions)
+                    .config("hive.metastore.uris", "thrift://hive-metastore:9083")
+                    .config('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider')
+                    .config('spark.sql.warehouse.dir', f's3a://lakehouse/')
+                    .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0,org.mongodb.spark:mongo-spark-connector:10.0.2')
+                    .enableHiveSupport()
+                    .getOrCreate())                
         return spark
     
     @staticmethod
