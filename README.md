@@ -10,6 +10,7 @@
 
 ![image](https://github.com/user-attachments/assets/89c2aa4f-47a4-415e-a252-19f46bd7f3ef)
 
-# MLOps cycle
+# MLOps Cycle
 
-![image](https://github.com/user-attachments/assets/bc2dcf43-91ad-4ddd-bc04-694c181e652a)
+![image](https://github.com/user-attachments/assets/ac499267-8bb6-435c-a531-e2242565189f)
+
