@@ -12,5 +12,6 @@
 
 # MLOps Cycle
 
-![image](https://github.com/user-attachments/assets/ac499267-8bb6-435c-a531-e2242565189f)
+![image](https://github.com/user-attachments/assets/00fd673f-6013-46a4-902e-990bae93ea43)
+
 
