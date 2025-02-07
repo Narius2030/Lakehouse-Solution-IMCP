@@ -1,6 +1,6 @@
 # General Architecture
 
-![image](https://github.com/user-attachments/assets/98ca988a-509c-477e-a30d-2ee204b1b3fc)
+![image](https://github.com/user-attachments/assets/fd5d89f3-ce58-4f8d-8c5e-377795e834a8)
 
 # Detailed Architecture
 
