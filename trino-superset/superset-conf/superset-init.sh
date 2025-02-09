@@ -1,5 +1,9 @@
 #!/bin/bash
 
+export ADMIN_USERNAME=${ADMIN_USERNAME}
+export ADMIN_EMAIL=${ADMIN_EMAIL}
+export ADMIN_PASSWORD=${ADMIN_PASSWORD}
+
 # create Admin user, you can read these values from env or anywhere else possible
 superset fab create-admin --username "$ADMIN_USERNAME" --firstname Superset --lastname Admin --email "$ADMIN_EMAIL" --password "$ADMIN_PASSWORD"
 
