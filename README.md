@@ -1,6 +1,7 @@
 # General Architecture
 
-![image](https://github.com/user-attachments/assets/fd5d89f3-ce58-4f8d-8c5e-377795e834a8)
+![image](https://github.com/user-attachments/assets/923a659b-0401-4c68-a28b-704d6db14098)
+
 
 # Detailed Architecture
 
@@ -12,7 +13,9 @@
 
 # MLOps Cycle
 
-![image](https://github.com/user-attachments/assets/07d7b690-6111-423e-88e5-5e13d9b644be)
+![image](https://github.com/user-attachments/assets/8c400e4c-48c5-4352-aa71-e2a4990cea85)
+
+
 
 
 
