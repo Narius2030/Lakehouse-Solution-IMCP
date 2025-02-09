@@ -1,5 +1,5 @@
 import sys
-sys.path.append("./work")
+sys.path.append("./work/imcp")
 from pyspark.sql import SparkSession
 
 
@@ -16,7 +16,8 @@ class SparkStreaming():
                     .config('spark.sql.warehouse.dir', f's3a://lakehouse/')
                     .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0,org.mongodb.spark:mongo-spark-connector:10.0.2')
                     .enableHiveSupport()
-                    .getOrCreate())                
+                    .getOrCreate()) 
+                                            
         return spark
     
     @staticmethod
@@ -43,12 +44,13 @@ class SparkStreaming():
                             .option("failOnDataLoss", False)
                             .option("startingOffsets", starting_offset)
                             .option("subscribe", topic)
-                            .load())
+                            .load()
+                      )
 
         return read_stream
     
     @staticmethod
-    def create_file_write_stream(stream, checkpoint_path, storage_path=None, trigger="1 seconds", output_mode="complete", file_format="delta"):
+    def write_microbatch_in_stream(spark, stream, checkpoint_path, settings, process_batch=None, write_format="console", trigger="10 seconds", output_mode="append"):
         """
         Write the stream back to a file store
 
@@ -56,7 +58,7 @@ class SparkStreaming():
             stream : DataStreamReader
                 The data stream reader for your stream
             file_format : str
-                mongodb, delta, parquet, csv etc
+                mongodb, delta, parquet, csv, orc etc
             storage_path : str
                 The file output path
             checkpoint_path : str
@@ -68,11 +70,13 @@ class SparkStreaming():
         """
 
         write_stream = (stream.writeStream
-                            .format(file_format)
+                            .format(write_format)
+                            .foreachBatch(lambda df, batch_id: process_batch(df, batch_id, spark, settings))
                             .option("checkpointLocation", checkpoint_path)
                             .trigger(processingTime=trigger)
-                            .outputMode(output_mode))
-
+                            .outputMode(output_mode)
+                       )
+        
         return write_stream
     
     

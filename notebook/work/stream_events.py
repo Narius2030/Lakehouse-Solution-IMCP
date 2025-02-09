@@ -1,40 +1,24 @@
 import sys
-sys.path.append("./work")
+sys.path.append("./work/imcp")
 
 from utils.config import get_settings
 from operators.streaming import SparkStreaming
-from utils.streaming_functions import process_stream
-from pyspark.sql.functions import col, lit, to_timestamp, split, size
+from utils.streaming_functions import process_batch, process_stream
+from utils.schema import *
 
 settings = get_settings()
-TOPIC="minio-parquets"
-CHECKPOINT_PATH = "s3a://lakehouse/streaming/test/checkpoint_minio_parquets"
+CSV_DATASET_TOPIC = "minio-parquets"
+CSV_CHECKPOINT_PATH = "s3a://lakehouse/streaming/imcp/checkpoints/checkpoint_minio"
 
 ## TODO: create a SparkSession
-spark = SparkStreaming.get_instance(app_name="Spark Streaming")
+spark = SparkStreaming.get_instance(app_name="Streamify Spark Streaming")
 
 ## TODO: create stream reader
-stream = SparkStreaming.create_kafka_read_stream(spark, settings.KAFKA_ADDRESS, settings.KAFKA_PORT, TOPIC)
-
-## TODO: process stream
-processed_stream = process_stream(stream)
+csv_stream = SparkStreaming.create_kafka_read_stream(spark, settings.KAFKA_ADDRESS, settings.KAFKA_PORT, CSV_DATASET_TOPIC)
+processed_csv_stream = process_stream(csv_stream)
 
 ## TODO: write stream into Delta Lake
-write_stream = SparkStreaming.create_file_write_stream(processed_stream, checkpoint_path=CHECKPOINT_PATH, output_mode="append", file_format="console")
-write_stream.start()
+write_csv_stream = SparkStreaming.write_microbatch_in_stream(spark, processed_csv_stream, CSV_CHECKPOINT_PATH, settings, process_batch, write_format="console")
+write_csv_stream.start()
 
 spark.streams.awaitAnyTermination()
-
-
-# df = spark.read.format("mongodb") \
-#             .option("spark.mongodb.read.connection.uri", settings.MONGODB_ATLAS_URI) \
-#             .option("spark.mongodb.read.database", "imcp") \
-#             .option("spark.mongodb.read.collection", "raw") \
-#             .load()
-
-# df = df.withColumn("created_time", to_timestamp(col("created_time"), "yyyy-MM-dd HH:mm:ss")) \
-#         .withColumn("caption_size", size(split(df["caption"], " ")))
-
-# print(df.printSchema())
-# print(df.show(5))
-# print(df.filter(df["caption_size"] < 100).count())

@@ -11,7 +11,7 @@ schema = StructType([
     StructField("pickup_datetime", TimestampType(), True),
 ])
 
-sample_schema = """
+csv_sample_schema = """
 {
     "EventName": "s3:ObjectCreated:Put",
     "Key": "lakehouse/imcp/parquets/customer.csv",
