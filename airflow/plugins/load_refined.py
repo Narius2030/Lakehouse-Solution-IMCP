@@ -4,7 +4,7 @@ sys.path.append('/opt/airflow')
 import pandas as pd
 import polars as pl
 from core.config import get_settings
-from utils.operators.database import MongoDBOperator
+from utils.operators.mongodb import MongoDBOperator
 from utils.operators.storage import MinioStorageOperator
 from utils.pre_proccess import tokenize, scaling_data, clean_text
 from utils.images.yolov8_encoder import YOLOFeatureExtractor

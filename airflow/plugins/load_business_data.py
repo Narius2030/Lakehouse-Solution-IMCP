@@ -11,7 +11,7 @@ from datetime import datetime
 from core.config import get_settings
 from utils.images.yolov8_encoder import YOLOFeatureExtractor
 from utils.operators.storage import MinioStorageOperator
-from utils.operators.database import MongoDBOperator
+from utils.operators.mongodb import MongoDBOperator
 
 
 settings = get_settings()

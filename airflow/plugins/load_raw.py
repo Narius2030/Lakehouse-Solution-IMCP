@@ -13,7 +13,7 @@ import pytz
 from tqdm import tqdm
 from datetime import timezone
 from core.config import get_settings
-from utils.operators.database import MongoDBOperator
+from utils.operators.mongodb import MongoDBOperator
 from utils.operators.storage import MinioStorageOperator
 from utils.images.yolov8_encoder import YOLOFeatureExtractor
 
