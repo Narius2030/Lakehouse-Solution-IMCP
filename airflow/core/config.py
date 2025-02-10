@@ -4,7 +4,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
-env_path = Path("/opt/airflow") / ".env"
+env_path = Path("./airflow") / ".env"
 load_dotenv(dotenv_path=env_path)
 
 
@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     MINIO_USER:str = os.getenv('MINIO_USER')
     MINIO_PASSWD:str = os.getenv('MINIO_PASSWD')
     MINIO_URL:str = os.getenv('MINIO_URL')
+     # Trino
+    TRINO_USER:str = os.getenv('TRINO_USER')
+    TRINO_HOST:str = os.getenv('TRINO_HOST')
+    TRINO_PORT:str = os.getenv('TRINO_PORT')
+    TRINO_CATALOG:str = os.getenv('TRINO_CATALOG')
     # Extracted Feature File Path
     EXTRACT_FEATURE_PATH:str = os.getenv('EXTRACT_FEATURE_PATH')
     RAW_DATA_PATH:str = os.getenv('RAW_DATA_PATH')

@@ -1,5 +1,4 @@
 import pymongo
-from tqdm import tqdm
 from datetime import datetime
 
 
@@ -114,7 +113,7 @@ class MongoDBOperator():
         """
         accepted_datas = []
         count = 0
-        for data in tqdm(datasets):
+        for data in datasets:
             params = {
                 'url': data['url'],
                 'caption': data['caption'],

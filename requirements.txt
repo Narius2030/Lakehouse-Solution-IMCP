@@ -4,19 +4,13 @@ pydantic
 pydantic-settings
 pymongo
 requests
-motor
 python-multipart
 numpy
+pandas
 pillow
-tensorflow==2.16.1
-torch
-torchvision
-ultralytics
-keras==3.3.3
-transformers
+# transformers
 opencv-python
-minio==7.1.16
 ijson
-pyspark==3.3.2
 kafka-python
 confluent-kafka
+minio
