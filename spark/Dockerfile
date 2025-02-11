@@ -28,3 +28,7 @@ RUN curl -O https://repo1.maven.org/maven2/software/amazon/awssdk/s3/2.18.41/s3-
     && mv mongodb-driver-core-4.5.1.jar /usr/local/spark/jars \
     && mv mongodb-driver-sync-4.5.1.jar /usr/local/spark/jars \
     && mv bson-4.5.1.jar /usr/local/spark/jars
+
+    
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir -r ./requirements.txt

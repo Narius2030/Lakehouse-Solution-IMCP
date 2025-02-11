@@ -26,18 +26,18 @@ def load_refined_data():
         for batch in sql_opt.data_generator('raw'):
             data = list(batch)
             df = pl.DataFrame(data)
-            df = df.filter(pl.col('created_time') >= latest_time)
+            # df = df.filter(pl.col('created_time') >= latest_time)
             lowered_df = df.with_columns(
                 *[pl.col(col).str.to_lowercase().alias(col) for col in ['caption']]
             )
             cleaned_df = lowered_df.with_columns(
                 *[pl.col(col).map_elements(lambda x: clean_text(x), return_dtype=pl.String).alias(col) for col in ['caption']],
-                pl.format("{}/augmented/images/{}", pl.lit(settings.MINIO_URL), pl.col("url").str.extract(r".*/(.*)").str.slice(-16, None)).alias("s3_url")
+                pl.format("{}/augmented/images/{}", pl.lit(settings.MINIO_URL), pl.col("original_url").str.extract(r".*/(.*)").str.slice(-16, None)).alias("s3_url")
             )
             tokenized_df = cleaned_df.with_columns(
                 *[ pl.col(col).map_elements(lambda x: tokenize(x), return_dtype=pl.List(pl.String)).alias(f'{col}_tokens') for col in ['caption']]
             )
-            refined_df = scaling_data(tokenized_df, ['url', 's3_url', 'caption', 'caption_tokens'])
+            refined_df = scaling_data(tokenized_df, ['original_url', 's3_url', 'caption', 'caption_tokens', 'word_count'])
             # insert data batch
             data = refined_df.to_dicts()
             mongo_operator.insert_batches('refined', data)

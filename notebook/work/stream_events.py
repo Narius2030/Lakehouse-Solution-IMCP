@@ -11,7 +11,7 @@ CSV_DATASET_TOPIC = "minio-parquets"
 CSV_CHECKPOINT_PATH = "s3a://lakehouse/streaming/imcp/checkpoints/checkpoint_minio"
 
 ## TODO: create a SparkSession
-spark = SparkStreaming.get_instance(app_name="Streamify Spark Streaming")
+spark = SparkStreaming.get_instance(app_name="Traffic Dataset Spark Streaming")
 
 ## TODO: create stream reader
 csv_stream = SparkStreaming.create_kafka_read_stream(spark, settings.KAFKA_ADDRESS, settings.KAFKA_PORT, CSV_DATASET_TOPIC)
