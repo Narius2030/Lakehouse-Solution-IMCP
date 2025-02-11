@@ -1,6 +1,7 @@
 import sys
 sys.path.append('./airflow')
 import polars as pl
+import requests
 from pyvi import ViTokenizer
 
 def tokenize_vietnamese(text: str):
@@ -24,3 +25,12 @@ def remove_stopwords(words):
     stopwords = read_stopwords()
     words = [word for word in words if word not in stopwords]
     return words
+
+def perform_imc(image_path, url):
+    response = requests.post(url=url, json={"image_url": image_path,})
+    print("Response in = ", response.elapsed.total_seconds())
+    if response.status_code == 200:
+        return response.json().get("response_message")
+    else:
+        print("Error:", response.status_code, response.text)
+        return None
