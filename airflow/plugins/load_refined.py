@@ -3,6 +3,7 @@ sys.path.append('./airflow')
 
 import pandas as pd
 import polars as pl
+from datetime import datetime
 from core.config import get_settings
 from utils.operators.mongodb import MongoDBOperator
 from utils.operators.trinodb import SQLOperators
@@ -30,9 +31,10 @@ def load_refined_data():
             cleaned_df = df.with_columns(
                 caption=pl.col("caption").str.to_lowercase(),
                 # caption_tokens=pl.col("caption").map_elements(lambda caption: tokenize_vietnamese(caption), return_dtype=pl.String()),
-                s3_url=pl.format("{}/augmented/images/{}", pl.lit(settings.MINIO_URL), pl.col("original_url").str.extract(r".*/(.*)").str.slice(-16, None)).alias("s3_url")
+                s3_url=pl.format("{}/augmented/images/{}", pl.lit(settings.MINIO_URL), pl.col("original_url").str.extract(r".*/(.*)").str.slice(-16, None)),
+                created_time=pl.lit(datetime.now())
             )
-            refined_df = scaling_data(cleaned_df, ['original_url', 's3_url', 'caption', 'caption_tokens', 'word_count'])
+            refined_df = scaling_data(cleaned_df, ['original_url', 's3_url', 'caption', 'caption_tokens', 'word_count', 'created_time'])
             # insert data batch
             data = refined_df.to_dicts()
             mongo_operator.insert_batches('refined', data)

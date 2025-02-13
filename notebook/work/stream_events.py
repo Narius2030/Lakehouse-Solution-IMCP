@@ -18,7 +18,12 @@ csv_stream = SparkStreaming.create_kafka_read_stream(spark, settings.KAFKA_ADDRE
 processed_csv_stream = process_stream(csv_stream)
 
 ## TODO: write stream into Delta Lake
-write_csv_stream = SparkStreaming.write_microbatch_in_stream(spark, processed_csv_stream, CSV_CHECKPOINT_PATH, settings, process_batch, write_format="console")
+write_csv_stream = SparkStreaming.write_microbatch_in_stream(spark, 
+                                                             processed_csv_stream, 
+                                                             CSV_CHECKPOINT_PATH, 
+                                                             settings.MONGODB_ATLAS_URI, 
+                                                             process_batch, 
+                                                             write_format="console")
 write_csv_stream.start()
 
 spark.streams.awaitAnyTermination()

@@ -97,8 +97,6 @@ class SQLOperators:
                 for i in range(0, len(data), chunk_size):
                     partitioned_data = data[i:i+chunk_size]
                     formatted_data = [tuple(col for col in row.values()) for row in partitioned_data]
-                    
-                    print(formatted_data)
                     cursor.executemany(query, formatted_data)
                     print(f"Inserted {len(formatted_data)} records")
         except Exception as ex:
