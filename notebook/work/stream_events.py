@@ -23,7 +23,7 @@ write_csv_stream = SparkStreaming.write_microbatch_in_stream(spark,
                                                              CSV_CHECKPOINT_PATH, 
                                                              settings.MONGODB_ATLAS_URI, 
                                                              process_batch, 
-                                                             write_format="console")
+                                                             trigger="60 seconds")
 write_csv_stream.start()
 
 spark.streams.awaitAnyTermination()

@@ -4,7 +4,7 @@ sys.path.append("./work/imcp")
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 from datetime import datetime
-from utils.schema import csv_sample_schema
+from utils.schema import csv_sample_schema, vehicle_map, traffic_status_map, street_map, environment_map, weather_map
 from utils.udf_helpers import tokenize_vietnamese
 
 def process_stream(stream):
@@ -25,6 +25,38 @@ def clean_caption(df_file, column):
                         .withColumn("created_time", F.lit(datetime.now()))
                  )
     return df_cleaned
+
+def classify_categories(df):
+    vehicle_col = F.array([F.lit(val) for val in vehicle_map])
+    traffic_status_col = F.array([F.lit(val) for val in traffic_status_map])
+    street_col = F.array([F.lit(val) for val in street_map])
+    environment_col = F.array([F.lit(val) for val in environment_map])
+    weather_col = F.array([F.lit(val) for val in weather_map])
+
+    # Duyệt qua toàn bộ danh sách `caption_tokens`, ánh xạ từng từ với `vehicle_map_expr`
+    df = (df
+            .withColumn("vehicle_type", 
+                        F.when(F.size(F.array_intersect(F.col("caption_tokens"), vehicle_col))==0, 
+                               F.array(F.lit("khác")))
+                        .otherwise(F.array_intersect(F.col("caption_tokens"), vehicle_col)))
+            .withColumn("traffic_type",
+                        F.when(F.size(F.array_intersect(F.col("caption_tokens"), traffic_status_col))==0,
+                              F.array(F.lit("bình_thường")))
+                        .otherwise(F.array_intersect(F.col("caption_tokens"), traffic_status_col)))
+            .withColumn("street_type",
+                        F.when(F.size(F.array_intersect(F.col("caption_tokens"), street_col))==0,
+                              F.array(F.lit("đường_phố")))
+                        .otherwise(F.array_intersect(F.col("caption_tokens"), street_col)))
+            .withColumn("environment_type",
+                        F.when(F.size(F.array_intersect(F.col("caption_tokens"), environment_col))==0,
+                              F.array(F.lit("khác")))
+                        .otherwise(F.array_intersect(F.col("caption_tokens"), environment_col)))
+            .withColumn("weather_type",
+                        F.when(F.size(F.array_intersect(F.col("caption_tokens"), weather_col))==0,
+                              F.array(F.lit("khác")))
+                        .otherwise(F.array_intersect(F.col("caption_tokens"), weather_col)))
+           )
+    return df
 
 def process_batch(df, batch_id, spark, db_uri):
     for row in df.collect():

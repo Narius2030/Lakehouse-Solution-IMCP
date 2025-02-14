@@ -11,6 +11,37 @@ schema = StructType([
     StructField("pickup_datetime", TimestampType(), True),
 ])
 
+vehicle_map = [
+    "ô_tô", 
+    "xe_máy", 
+    "xe_buýt", 
+    "xe_tải", 
+    "xe_hơi"
+]
+
+traffic_status_map = [
+    "đông_đúc", 
+    "vắng", 
+    "bình_thường"
+]
+
+street_map = [
+    "đường_cao_tốc", 
+    "giao_lộ"
+]
+
+environment_map = [
+    "công_cộng", 
+    "thương_mại", 
+    "công_trường"
+]
+
+weather_map = [
+    "nắng", 
+    "mưa"
+]
+
+
 csv_sample_schema = """
 {
     "EventName": "s3:ObjectCreated:Put",
