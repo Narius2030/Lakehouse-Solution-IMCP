@@ -43,12 +43,13 @@ class SQLOperators:
             with closing(self.__dbconn.cursor()) as cursor:
                 cursor.execute(query)
                 latest_time = cursor.fetchone()
-                return latest_time
+                print("===> Latest time is: ", latest_time)
+                return latest_time[0]
         except Exception as ex:
             raise Exception(f"====> Can't execute {query} - {str(ex)}")
     
-    def data_generator(self, table_name, columns=None, batch_size=10000):
-        query = QueryTemplate(table_name).create_query_select(columns)
+    def data_generator(self, table_name, columns=None, latest_time="1970-01-01T00:00:00.000+00:00", batch_size=10000):
+        query = QueryTemplate(table_name).create_query_select(columns, latest_time)
         try:
             batch = []
             with closing(self.__dbconn.cursor()) as cursor:
