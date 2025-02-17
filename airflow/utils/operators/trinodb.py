@@ -43,7 +43,6 @@ class SQLOperators:
             with closing(self.__dbconn.cursor()) as cursor:
                 cursor.execute(query)
                 latest_time = cursor.fetchone()
-                print("===> Latest time is: ", latest_time)
                 return latest_time[0]
         except Exception as ex:
             raise Exception(f"====> Can't execute {query} - {str(ex)}")
