@@ -12,12 +12,18 @@ class SparkStreaming():
                     .config("spark.executor.memory", executor_memory)
                     .config("spark.sql.shuffle.partitions", partitions)
                     .config("hive.metastore.uris", "thrift://hive-metastore:9083")
+                    .config("hive.exec.dynamic.partition.mode", "nonstrict")
+                    .config("spark.streaming.backpressure.enabled", "true")
+                    .config("spark.hadoop.fs.s3a.path.style.access", "true")
+                    .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+                    .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
+                    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
                     .config('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider')
-                    .config('spark.sql.warehouse.dir', f's3a://lakehouse/')
+                    .config('spark.sql.warehouse.dir', 's3a://lakehouse/')
+                    .config('hive.metastore.warehouse.dir', 's3a://lakehouse/')
                     .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0,org.mongodb.spark:mongo-spark-connector:10.0.2')
                     .enableHiveSupport()
-                    .getOrCreate()) 
-                                            
+                    .getOrCreate())                
         return spark
     
     @staticmethod
