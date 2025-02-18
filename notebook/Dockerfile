@@ -34,4 +34,4 @@ RUN curl -O https://repo1.maven.org/maven2/software/amazon/awssdk/s3/2.18.41/s3-
     && mv mongodb-driver-sync-4.5.1.jar /usr/local/spark/jars \
     && mv bson-4.5.1.jar /usr/local/spark/jars
 
-RUN pip install minio==7.1.16
+RUN pip install pyvi pandas pyarrow minio==7.1.16

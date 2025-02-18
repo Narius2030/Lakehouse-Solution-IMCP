@@ -1,8 +1,8 @@
 import sys
 sys.path.append("./work/imcp")
 
-import pyspark.sql.functions as F
-import pyspark.sql.types as T
+import pyspark.sql.functions as F       # type: ignore
+import pyspark.sql.types as T           # type: ignore
 from datetime import datetime
 from utils.schema import csv_sample_schema, vehicle_map, traffic_status_map, street_map, environment_map, weather_map
 from utils.udf_helpers import tokenize_vietnamese
