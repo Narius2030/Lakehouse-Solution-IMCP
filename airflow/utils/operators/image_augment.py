@@ -82,40 +82,65 @@ def upload_image(image_matrix, image_name, bucket_name, file_path, settings):
     minio_operator = MinioStorageOperator(endpoint=f'{settings.MINIO_HOST}:{settings.MINIO_PORT}',
                                         access_key=settings.MINIO_USER,
                                         secret_key=settings.MINIO_PASSWD)
+
+    image_bgr = cv2.cvtColor(image_matrix, cv2.COLOR_RGB2BGR)
     
-    _, encoded_image = cv2.imencode('.jpg', image_matrix)
+    _, encoded_image = cv2.imencode('.jpg', image_bgr)
     image_bytes = io.BytesIO(encoded_image)
     minio_operator.upload_object_bytes(image_bytes, bucket_name, f'{file_path}/{image_name}', "image/jpeg")
 
 def cv2_read_image(image_bytes):
-    image_array = np.asarray(bytearray(image_bytes), dtype=np.uint8)
-    # Đọc ảnh bằng OpenCV
-    image_rgb = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    # image_array = np.asarray(bytearray(image_bytes), dtype=np.uint8)
+    # if image_array is None or image_array.size == 0:
+    #     raise ValueError("image_array is empty. Check if the image was loaded correctly.")
+    # image_rgb = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     # Chuyển đổi từ BGR (OpenCV) sang RGB
-    # image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    # if image_rgb.mode not in ['RGB', 'L']:
+    #     image_rgb = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2RGB)
+    
+    # Đọc ảnh bằng PIL
+    image = Image.open(io.BytesIO(image_bytes))
+    # Chuyển đổi ảnh sang RGB nếu cần
+    if image.mode not in ['RGB', 'L']:
+        image = image.convert('RGB')
+    
+    # Chuyển sang numpy array
+    image_rgb = np.array(image)
+    
+    # Đảm bảo ảnh có đúng số kênh màu (1 hoặc 3)
+    if len(image_rgb.shape) == 2:  # Ảnh grayscale
+        image_rgb = np.stack([image_rgb] * 3, axis=-1)  # Chuyển thành 3 kênh
+    elif len(image_rgb.shape) == 3 and image_rgb.shape[2] == 4:  # Ảnh RGBA
+        image_rgb = image_rgb[:, :, :3]  # Bỏ kênh alpha
+    
     return image_rgb
 
 def image_from_url(image_url:str):
     try:
         image_repsonse = requests.get(image_url, timeout=2)
         image_rgb = cv2_read_image(image_repsonse.content)
-        return image_rgb
+        return image_rgb, False
     except Exception:
         for attempt in range(0, 2):
             try:
                 image_repsonse = requests.get(image_url, timeout=2)
                 image_rgb = cv2_read_image(image_repsonse.content)
-                return image_rgb  # Thành công, thoát khỏi vòng lặp thử lại
+                return image_rgb, False  # Thành công, thoát khỏi vòng lặp thử lại
             except Exception as e:
                 print(f"Tải lại dữ liệu từ {image_url} (lần {attempt+1}/{2}): {str(e)}")
                 time.sleep(2)  # Chờ đợi trước khi thử lại
-    return None
+    return None, True
     
 
 def augment_image(image, num_augmentations=3):
     """Tạo nhiều phiên bản augmented của một ảnh"""
     try:
+        # Chuyển đổi ảnh sang RGB nếu cần
+        image = Image.fromarray(image)
+        if image.mode not in ['RGB', 'L']:
+            image = image.convert('RGB')
         # Đảm bảo ảnh có đúng số kênh màu (1 hoặc 3)
+        image = np.array(image)
         if len(image.shape) == 2:  # Ảnh grayscale
             image = np.stack([image] * 3, axis=-1)  # Chuyển thành 3 kênh
         elif len(image.shape) == 3 and image.shape[2] == 4:  # Ảnh RGBA

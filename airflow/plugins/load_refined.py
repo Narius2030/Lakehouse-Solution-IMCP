@@ -28,24 +28,25 @@ def load_refined_data(params):
             for data in tqdm(datarows):
                 timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
                 image_name = f'image_{timestamp}.jpg'
-                data['s3_url'] = image_name
+                data['s3_url'] =  f'{settings.AUGMENTED_IMAGE_URL}/image_{timestamp}.jpg'
                 # original image
-                original_image = image_from_url(data['original_url'])
-                upload_image(original_image, image_name, params['bucket_name'], params['file_image_path'], settings)
-                
-                ## TODO: augment original image
-                new_data.append(data)
-                augmented_images = augment_image(original_image)
-                # Lưu các ảnh augmented và thêm vào DataFrame
-                for aug_idx, aug_image in enumerate(augmented_images):
-                    try:
-                        # Thêm vào danh sách dữ liệu mới với caption giống ảnh gốc
-                        new_image_name = f'image_{timestamp}_{aug_idx}.jpg'
-                        upload_image(aug_image, new_image_name, params['bucket_name'], params['file_image_path'], settings)
-                        new_data.append(data)
-                    except Exception as e:
-                        print(f"Lỗi khi lưu ảnh augmented: {str(e)}")
-                        continue
+                original_image, is_error = image_from_url(data['original_url'])
+                if is_error == False:
+                    upload_image(original_image, image_name, params['bucket_name'], params['file_image_path'], settings)
+                    ## TODO: augment original image
+                    new_data.append(data)
+                    augmented_images = augment_image(original_image)
+                    # Lưu các ảnh augmented và thêm vào DataFrame
+                    for aug_idx, aug_image in enumerate(augmented_images):
+                        try:
+                            # Thêm vào danh sách dữ liệu mới với caption giống ảnh gốc
+                            new_image_name = f'image_{timestamp}_{aug_idx}.jpg'
+                            upload_image(aug_image, new_image_name, params['bucket_name'], params['file_image_path'], settings)
+                            data['s3_url'] = f'{settings.AUGMENTED_IMAGE_URL}/image_{timestamp}_{aug_idx}.jpg'
+                            new_data.append(data)
+                        except Exception as e:
+                            print(f"Lỗi khi lưu ảnh augmented: {str(e)}")
+                            continue
             
             # insert metadata
             df = pl.DataFrame(new_data)
@@ -59,9 +60,11 @@ def load_refined_data(params):
         
     except Exception as exc:
         # Write logs
-        sql_opt.write_log('augmented_metadata', layer='silver', start_time=start_time, status="ERROR", error_message=str(exc), action="insert", affected_rows=affected_rows)
+        # sql_opt.write_log('augmented_metadata', layer='silver', start_time=start_time, status="ERROR", error_message=str(exc), action="insert", affected_rows=affected_rows)
         raise Exception(str(exc))
-            
+    
+def dump_backup():
+    pass
 
 if __name__=='__main__':
     params = {
