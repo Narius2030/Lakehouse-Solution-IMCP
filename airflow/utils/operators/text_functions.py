@@ -16,12 +16,9 @@ def scaling_data(df:pl.DataFrame, selected_columns:list=None):
         temp_df = df.select('*')
     return temp_df
 
-def clean_caption(df:pl.DataFrame, storage_path:str):
-    cleaned_df = df.with_columns(
-        # caption_tokens=pl.col("caption").map_elements(lambda caption: tokenize_vietnamese(caption), return_dtype=pl.String()),
-        s3_url=pl.format("{}/augmented/images/{}", pl.lit(storage_path), pl.col("original_url").str.extract(r".*/(.*)").str.slice(-16, None)),
-        created_time=pl.lit(datetime.now())
-    )
+# s3_url=pl.format("{}/augmented/images/{}", pl.lit(storage_path), pl.lit(image_name)),
+def clean_caption(df:pl.DataFrame):
+    cleaned_df = df.with_columns(created_time=pl.lit(datetime.now()))
     return cleaned_df
 
 def read_stopwords():

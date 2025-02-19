@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     MINIO_USER:str = os.getenv('MINIO_USER')
     MINIO_PASSWD:str = os.getenv('MINIO_PASSWD')
     MINIO_URL:str = os.getenv('MINIO_URL')
+    AUGMENTED_IMAGE_URL:str = f"{MINIO_URL}/augmented/images"
      # Trino
     TRINO_USER:str = os.getenv('TRINO_USER')
     TRINO_HOST:str = os.getenv('TRINO_HOST')
