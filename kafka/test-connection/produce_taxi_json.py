@@ -32,5 +32,5 @@ def csv_generator():
 
 
 if __name__ == '__main__':
-    prod = Prod(KAFKA_ADDRESS, 'test', csv_generator)
+    prod = Prod(KAFKA_ADDRESS, 'yellow_taxi_ride', csv_generator)
     prod.run()

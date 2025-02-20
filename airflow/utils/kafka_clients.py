@@ -9,15 +9,18 @@ class Prod():
         self.kafka_addr = kafka_addr
         self.topic = topic
         self.generator = generator
+        self.max_size=5242880
     
     def run(self):
         producer = KafkaProducer(bootstrap_servers=[f'{self.kafka_addr}:9092'],
+                                 max_request_size=self.max_size,
                                  key_serializer=lambda x: dumps(x).encode('utf-8'),
                                  value_serializer=lambda x: dumps(x, default=str).encode('utf-8'))
         # send data to topic
         for data in self.generator():
-            producer.send(self.topic, key=data['key'], value=data['value'])
-            print("processing")
+            future = producer.send(self.topic, key=data['key'], value=data['value'])
+            record_metadata = future.get(timeout=10)
+            print("processing: ", record_metadata)
         producer.close()
     
 

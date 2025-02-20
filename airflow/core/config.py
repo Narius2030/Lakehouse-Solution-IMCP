@@ -11,6 +11,9 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     # MongoDB Atlas
     DATABASE_URL: str = os.getenv('MONGO_ATLAS_PYTHON')
+    # Kafka
+    KAFKA_ADDRESS:str = os.getenv('KAFKA_ADDRESS')
+    KAFKA_PORT:str = os.getenv('KAFKA_PORT')
     # MinIO
     MINIO_HOST:str = os.getenv('MINIO_HOST')
     MINIO_PORT:str = os.getenv('MINIO_PORT')
