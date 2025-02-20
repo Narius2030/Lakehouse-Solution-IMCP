@@ -1,46 +1,10 @@
-from pyspark.sql.types import IntegerType, StringType, DoubleType, TimestampType, StructType, StructField
+from pyspark.sql.types import StringType, StructType, StructField
 
-schema = StructType([
-    StructField("vendorId", IntegerType(), True),
-    StructField("passenger_count", IntegerType(), True),
-    StructField("trip_distance", DoubleType(), True),
-    StructField("pickup_location", IntegerType(), True),
-    StructField("dropoff_location", IntegerType(), True),
-    StructField("payment_type", IntegerType(), True),
-    StructField("total_amount", DoubleType(), True),
-    StructField("pickup_datetime", TimestampType(), True),
+image_schema = StructType([
+    StructField("image_name", StringType(), False),
+    StructField("image_base64", StringType(), False),
+    StructField("image_size", StringType(), True)
 ])
-
-vehicle_map = [
-    "ô_tô", 
-    "xe_máy", 
-    "xe_buýt", 
-    "xe_tải", 
-    "xe_hơi"
-]
-
-traffic_status_map = [
-    "đông_đúc", 
-    "vắng", 
-    "bình_thường"
-]
-
-street_map = [
-    "đường_cao_tốc", 
-    "giao_lộ"
-]
-
-environment_map = [
-    "công_cộng", 
-    "thương_mại", 
-    "công_trường"
-]
-
-weather_map = [
-    "nắng", 
-    "mưa"
-]
-
 
 csv_sample_schema = """
 {

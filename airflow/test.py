@@ -24,16 +24,24 @@ def perform_imc(image_url):
         return response.json().get("response_message")
     else:
         print("Error:", response.status_code, response.text)
-        return None
+        return ""
 
-def image_generator():        
+def image_generator():
     with open('./data/workspace.jpg', 'rb') as file:
         image_bytes = file.read()
         image_base64 = base64.b64encode(image_bytes).decode("utf-8")
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    
+    with Image.open('./data/workspace.jpg') as img:
+        width, height = img.size
+    
+        value = {
+            'image_name': f"image_{timestamp}.jpg",
+            'image_base64': str(image_base64),
+            'image_size': f"{width}x{height}"
+        }
         
-        print(len(image_base64))
-        yield {'key': timestamp, 'value': {'image_base64': str(image_base64)}}
+        yield {'key': timestamp, 'value': value}
         time.sleep(2)
 
 def read_image_from_kafka(message):
@@ -47,8 +55,8 @@ if __name__ == "__main__":
     # result = perform_imc("https://img.cand.com.vn/NewFiles/Images/2024/03/19/a-1710822064944.jpg")
     # print("Image Caption: ", result)
     
-    # producer = Prod(settings.KAFKA_ADDRESS, 'test', image_generator)
-    # producer.run()
+    producer = Prod(settings.KAFKA_ADDRESS, 'mobile-images', image_generator)
+    producer.run()
     
-    consumer = Cons(settings.KAFKA_ADDRESS, 'test', 'read_image', read_image_from_kafka)
-    consumer.run()
+    # consumer = Cons(settings.KAFKA_ADDRESS, 'test', 'read_image', read_image_from_kafka)
+    # consumer.run()
