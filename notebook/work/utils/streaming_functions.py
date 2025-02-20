@@ -37,7 +37,7 @@ def clean_caption(df, column):
     return df_cleaned
 
 def format_user_data(df):
-    formatted_df = (df.withColumn("original_url", F.concat(F.lit("http://160.191.244.13:9000/lakehouse/user-data/images/"), F.col('image_name')))
+    formatted_df = (df.withColumn("original_url", F.concat(F.lit("http://160.191.244.13:9000/mlflow/user-data/images/"), F.col('image_name')))
                     .withColumn("source_website", F.lit("Mobile"))
                     .withColumn("search_query", F.lit("None"))
                     .withColumn("resolution", F.col('image_size'))
