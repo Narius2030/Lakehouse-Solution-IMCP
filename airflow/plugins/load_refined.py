@@ -8,8 +8,8 @@ from datetime import datetime
 from core.config import get_settings
 from utils.operators.mongodb import MongoDBOperator
 from utils.operators.trinodb import SQLOperators
-from utils.operators.text_functions import scaling_data, clean_caption
-from utils.operators.image_augment import image_from_url, upload_image, augment_image
+from utils.operators.text import TextOperator
+from utils.operators.image import ImageOperator
 
 
 settings = get_settings()
@@ -30,18 +30,18 @@ def load_refined_data(params):
                 image_name = f'image_{timestamp}.jpg'
                 data['s3_url'] =  f'{settings.AUGMENTED_IMAGE_URL}/image_{timestamp}.jpg'
                 # original image
-                original_image, is_error = image_from_url(data['original_url'])
+                original_image, is_error = ImageOperator.image_from_url(data['original_url'])
                 if is_error == False:
-                    upload_image(original_image, image_name, params['bucket_name'], params['file_image_path'], settings)
+                    ImageOperator.upload_image(original_image, image_name, params['bucket_name'], params['file_image_path'], settings)
                     ## TODO: augment original image
                     new_data.append(data)
-                    augmented_images = augment_image(original_image)
+                    augmented_images = ImageOperator.augment_image(original_image)
                     # Lưu các ảnh augmented và thêm vào DataFrame
                     for aug_idx, aug_image in enumerate(augmented_images):
                         try:
                             # Thêm vào danh sách dữ liệu mới với caption giống ảnh gốc
                             new_image_name = f'image_{timestamp}_{aug_idx}.jpg'
-                            upload_image(aug_image, new_image_name, params['bucket_name'], params['file_image_path'], settings)
+                            ImageOperator.upload_image(aug_image, new_image_name, params['bucket_name'], params['file_image_path'], settings)
                             data['s3_url'] = f'{settings.AUGMENTED_IMAGE_URL}/image_{timestamp}_{aug_idx}.jpg'
                             new_data.append(data)
                         except Exception as e:
@@ -50,8 +50,8 @@ def load_refined_data(params):
             
             # insert metadata
             df = pl.DataFrame(new_data)
-            cleaned_df = clean_caption(df)
-            refined_df = scaling_data(cleaned_df, ['original_url', 's3_url', 'caption', 'tokenized_caption', 'created_time'])
+            cleaned_df = TextOperator.clean_caption(df)
+            refined_df = TextOperator.scaling_data(cleaned_df, ['original_url', 's3_url', 'caption', 'tokenized_caption', 'created_time'])
             new_data = refined_df.to_dicts()
             mongo_operator.insert_batches('refined', new_data)
             print("SUCCESS with", len(new_data))
