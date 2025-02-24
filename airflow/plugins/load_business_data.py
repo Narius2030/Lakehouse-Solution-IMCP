@@ -7,6 +7,7 @@ import pandas as pd
 from tqdm import tqdm
 from datetime import datetime
 from core.config import get_settings
+from utils.operators.text import TextOperator
 from utils.operators.image import ImageOperator
 from utils.operators.trinodb import SQLOperators
 from utils.operators.storage import MinioStorageOperator
@@ -48,9 +49,11 @@ def load_encoded_data():
             datarows = list(batch)
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             for row in datarows:
-                encoded_caption = ImageOperator.encode_caption(row['tokenized_caption'])
+                encoded_caption = TextOperator.encode_caption(row['tokenized_caption'])
+                encoded_image = ImageOperator.encode_image(row['original_url'])
                 encoded_data.append({
                     "image_url": row['original_url'],
+                    "pixel_values": encoded_image['pixel_values'],
                     "input_ids": encoded_caption['input_ids'],
                     "attention_mask": encoded_caption['attention_mask']
                 })

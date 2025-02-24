@@ -1,14 +1,12 @@
 # from utils.operators.trinodb import SQLOperators
+# from utils.kafka_clients import Prod, Cons
+from utils.operators.image import ImageOperator
 from core.config import get_settings
-from utils.kafka_clients import Prod, Cons
 from datetime import datetime
 from PIL import Image
-import polars as pl
 import requests
 import base64
 import time
-import io
-import json
 
 settings = get_settings()
 # sql_opt = SQLOperators('imcp', settings)
@@ -44,19 +42,17 @@ def image_generator():
         yield {'key': timestamp, 'value': value}
         time.sleep(2)
 
-def read_image_from_kafka(message):
-    value = message.value().decode('utf-8')
-    image_base64 = json.loads(value)['image_base64']
-    image_binary = base64.b64decode(image_base64)
-    image = Image.open(io.BytesIO(image_binary))
-    image.show()
 
 if __name__ == "__main__":
     # result = perform_imc("https://img.cand.com.vn/NewFiles/Images/2024/03/19/a-1710822064944.jpg")
     # print("Image Caption: ", result)
     
-    producer = Prod(settings.KAFKA_ADDRESS, 'mobile-images', image_generator)
-    producer.run()
+    # producer = Prod(settings.KAFKA_ADDRESS, 'mobile-images', image_generator)
+    # producer.run()
     
     # consumer = Cons(settings.KAFKA_ADDRESS, 'test', 'read_image', read_image_from_kafka)
     # consumer.run()
+    
+    image_array = ImageOperator.encode_image("http://images.cocodataset.org/val2017/000000399462.jpg")
+    print(image_array.keys())
+    print(image_array)

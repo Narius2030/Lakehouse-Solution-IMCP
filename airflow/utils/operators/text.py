@@ -4,6 +4,8 @@ import polars as pl
 import requests
 from datetime import datetime
 from pyvi import ViTokenizer
+from transformers import AutoTokenizer
+
 
 class TextOperator():
     @staticmethod
@@ -36,3 +38,12 @@ class TextOperator():
         else:
             print("Error:", response.status_code, response.text)
             return None
+        
+    @staticmethod
+    def encode_caption(caption:str):
+        # Load tokenizer của BartPho
+        tokenizer = AutoTokenizer.from_pretrained("vinai/bartpho-word")
+        # encode caption
+        tokenized = tokenizer.encode_plus(caption, return_tensors="pt", padding="max_length", truncation=True)
+        tokenized_dict = dict(tokenized)
+        return tokenized_dict

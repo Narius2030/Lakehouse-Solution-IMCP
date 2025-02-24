@@ -5,7 +5,7 @@ import requests
 import numpy as np
 import albumentations as A
 from PIL import Image
-from transformers import AutoTokenizer
+from transformers import ViTImageProcessor
 from utils.operators.storage import MinioStorageOperator
 
 
@@ -62,6 +62,16 @@ class ImageOperator():
         # Đảm bảo kích thước output đồng nhất
         A.Resize(512, 512, p=1.0)
     ])
+
+
+    @staticmethod
+    def encode_image(image_url:str):
+        feature_extractor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
+        image_rgb, is_error = ImageOperator.image_from_url(image_url)
+        if is_error == False:
+            pixel_values = feature_extractor(image_rgb, return_tensors="pt")
+        return pixel_values
+    
 
     @staticmethod
     def upload_image(image_matrix, image_name, bucket_name, file_path, settings):
@@ -138,13 +148,3 @@ class ImageOperator():
             print(f"Loại lỗi: {type(e).__name__}")
             print(f"Nội dung lỗi: {str(e)}")
             return []
-        
-    
-    @staticmethod
-    def encode_caption(caption:str):
-        # Load tokenizer của BartPho
-        tokenizer = AutoTokenizer.from_pretrained("vinai/bartpho-word")
-        # encode caption
-        tokenized = tokenizer.encode_plus(caption, return_tensors="pt", padding="max_length", truncation=True)
-        tokenized_dict = dict(tokenized)
-        return tokenized_dict
