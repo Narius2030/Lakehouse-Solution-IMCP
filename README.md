@@ -1,4 +1,4 @@
-# General Architecture
+# General Architecture of Data Lake
 
 - Builded a Data Lake following Medallion architecture with `catalog layer` and `storage layer` for storing image and its metadata
 - Streamed events from `file uploading` and `captured images` from mobile app (was sent by API) into raw storage area, so that it helps data more various for AI training
@@ -20,6 +20,8 @@
 ![image](https://github.com/user-attachments/assets/8c400e4c-48c5-4352-aa71-e2a4990cea85)
 
 # FastAPI-based Microservice
+
+> More detail in this [Repo](https://github.com/Narius2030/FastAPI-Microservice-IMCP.git)
 
 - Develop an APIs to retrieve metadata and images which were normalized in Data Lake for automated incremental learning process.
 - Develop an APIs to upload captured image and metadata of user to storage system for later usages and then activate model.
