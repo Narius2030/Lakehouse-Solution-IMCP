@@ -18,6 +18,8 @@ RUN curl -O https://repo1.maven.org/maven2/software/amazon/awssdk/s3/2.18.41/s3-
     && curl -O https://repo1.maven.org/maven2/io/delta/delta-core_2.12/2.3.0/delta-core_2.12-2.3.0.jar \
     && curl -O https://repo1.maven.org/maven2/io/delta/delta-storage/2.3.0/delta-storage-2.3.0.jar \
     # && curl -O https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.2.0/spark-sql-kafka-0-10_2.12-3.2.0.jar \
+    # && curl -O https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.2.0/spark-token-provider-kafka-0-10_2.12-3.2.0.jar \
+    # && curl -O https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/2.8.0/kafka-clients-2.8.0.jar \
     && curl -O https://repo1.maven.org/maven2/org/mongodb/spark/mongo-spark-connector/10.0.2/mongo-spark-connector-10.0.2.jar \
     && curl -O https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/4.5.1/mongodb-driver-core-4.5.1.jar \
     && curl -O https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.5.1/mongodb-driver-sync-4.5.1.jar \
@@ -29,6 +31,9 @@ RUN curl -O https://repo1.maven.org/maven2/software/amazon/awssdk/s3/2.18.41/s3-
     && mv hadoop-common-3.3.2.jar /usr/local/spark/jars \
     && mv delta-core_2.12-2.3.0.jar /usr/local/spark/jars \
     && mv delta-storage-2.3.0.jar /usr/local/spark/jars \
+    # && mv spark-sql-kafka-0-10_2.12-3.2.0.jar /opt/bitnami/spark/jars \
+    # && mv spark-token-provider-kafka-0-10_2.12-3.2.0.jar /opt/bitnami/spark/jars \
+    # && mv kafka-clients-2.8.0.jar /opt/bitnami/spark/jars \
     && mv mongo-spark-connector-10.0.2.jar /usr/local/spark/jars \
     && mv mongodb-driver-core-4.5.1.jar /usr/local/spark/jars \
     && mv mongodb-driver-sync-4.5.1.jar /usr/local/spark/jars \
