@@ -4,9 +4,8 @@ sys.path.append('./airflow')
 import os
 import pickle
 import pandas as pd
-from tqdm import tqdm
 from datetime import datetime
-from core.config import get_settings
+from utils.config import get_settings
 from utils.operators.text import TextOperator
 from utils.operators.image import ImageOperator
 from utils.operators.trinodb import SQLOperators

@@ -1,7 +1,7 @@
 # from utils.operators.trinodb import SQLOperators
 # from utils.kafka_clients import Prod, Cons
 from utils.operators.image import ImageOperator
-from core.config import get_settings
+from utils.config import get_settings
 from datetime import datetime
 from PIL import Image
 import requests

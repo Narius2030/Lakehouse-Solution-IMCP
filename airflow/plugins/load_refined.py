@@ -5,7 +5,7 @@ import pandas as pd
 import polars as pl
 from tqdm import tqdm
 from datetime import datetime
-from core.config import get_settings
+from utils.config import get_settings
 from utils.operators.mongodb import MongoDBOperator
 from utils.operators.trinodb import SQLOperators
 from utils.operators.text import TextOperator

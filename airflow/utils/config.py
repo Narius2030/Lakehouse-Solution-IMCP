@@ -28,7 +28,6 @@ class Settings(BaseSettings):
     TRINO_CATALOG:str = os.getenv('TRINO_CATALOG')
     # Extracted Feature File Path
     EXTRACT_FEATURE_PATH:str = os.getenv('EXTRACT_FEATURE_PATH')
-    RAW_DATA_PATH:str = os.getenv('RAW_DATA_PATH')
     # Working Directory
     WORKING_DIRECTORY:str = '/opt/airflow'
     
