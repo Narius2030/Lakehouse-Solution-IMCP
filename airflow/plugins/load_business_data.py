@@ -4,6 +4,7 @@ sys.path.append('./airflow')
 import os
 import pickle
 import pandas as pd
+import concurrent.futures as cf
 from datetime import datetime
 from utils.config import get_settings
 from utils.operators.text import TextOperator
@@ -31,6 +32,15 @@ def load_image_storage(file_name:str, partition:str):
     finally:
         os.remove(f'{settings.EXTRACT_FEATURE_PATH}/{file_name}')
 
+def process_row(row):
+    encoded_caption = TextOperator.encode_caption(row['tokenized_caption'])
+    encoded_image = ImageOperator.encode_image(row['original_url'])
+    return {
+        "image_url": row['original_url'],
+        "pixel_values": encoded_image['pixel_values'],
+        "input_ids": encoded_caption['input_ids'],
+        "attention_mask": encoded_caption['attention_mask']
+    }
 
 def load_encoded_data():
     file_names = []
@@ -47,15 +57,9 @@ def load_encoded_data():
             encoded_data = []
             datarows = list(batch)
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            for row in datarows:
-                encoded_caption = TextOperator.encode_caption(row['tokenized_caption'])
-                encoded_image = ImageOperator.encode_image(row['original_url'])
-                encoded_data.append({
-                    "image_url": row['original_url'],
-                    "pixel_values": encoded_image['pixel_values'],
-                    "input_ids": encoded_caption['input_ids'],
-                    "attention_mask": encoded_caption['attention_mask']
-                })
+            # Sử dụng ProcessPoolExecutor cho CPU-bound tasks
+            with cf.ProcessPoolExecutor(max_workers=2) as executor:
+                encoded_data = list(executor.map(process_row, datarows))
             
             file_name = f"encoded_data_{timestamp}.pkl"
             with open(f"./airflow/data/{file_name}", "wb") as f:
@@ -86,4 +90,14 @@ def encode_image(image_url):
 if __name__=='__main__':
     load_encoded_data()
     # load_image_storage()
-                 
+    
+    
+    # for row in datarows:
+            #     encoded_caption = TextOperator.encode_caption(row['tokenized_caption'])
+            #     encoded_image = ImageOperator.encode_image(row['original_url'])
+            #     encoded_data.append({
+            #         "image_url": row['original_url'],
+            #         "pixel_values": encoded_image['pixel_values'],
+            #         "input_ids": encoded_caption['input_ids'],
+            #         "attention_mask": encoded_caption['attention_mask']
+            #     })
