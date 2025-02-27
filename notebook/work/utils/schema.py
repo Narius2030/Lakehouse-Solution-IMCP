@@ -6,7 +6,17 @@ image_schema = StructType([
     StructField("image_size", StringType(), True)
 ])
 
-csv_sample_schema = """
+
+csv_schema = StructType([
+    StructField("original_url", StringType(), False),
+    StructField("source_website", StringType(), True),
+    StructField("resolution", StringType(), True),
+    StructField("search_query", StringType(), True),
+    StructField("local_path", StringType(), True),
+    StructField("caption", StringType(), False)
+])
+
+minio_schema = """
 {
     "EventName": "s3:ObjectCreated:Put",
     "Key": "lakehouse/imcp/parquets/customer.csv",

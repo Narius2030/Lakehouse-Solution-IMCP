@@ -4,11 +4,14 @@ sys.path.append("./work/imcp")
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 from datetime import datetime
-from utils.schema import csv_sample_schema, image_schema
+from utils.schema import minio_schema, image_schema, csv_schema
 from utils.udf_helpers import tokenize_vietnamese, generate_caption, upload_image
 
+
+### Parse value column in kafka message
+###
 def csv_process_stream(stream):
-    value_schema = F.schema_of_json(csv_sample_schema)
+    value_schema = F.schema_of_json(minio_schema)
     stream = (stream
                 .selectExpr("CAST(value AS STRING)")
                 .select(F.from_json(F.col("value"), value_schema).alias("data"))
@@ -24,6 +27,9 @@ def mobile_process_stream(stream):
              )
     return stream
 
+
+### Process stream data
+###
 def clean_caption(df, column):
     regex_pattern = r'[!“"”#$%&()*+,./:;<=>?@\[\\\]\^{|}~-]'
     df_cleaned = (df.withColumn(column, F.regexp_replace(F.col(column), regex_pattern, ""))
@@ -47,16 +53,23 @@ def format_user_data(df):
     return formatted_df
 
 
+### Write stream data
+###
 def csv_process_batch(df, batch_id, spark, db_uri):
     for row in df.collect():
         file_path = f"s3a://{row['Key']}"
         df_file = (spark.read
+                    .option("delimiter", ",")
+                    .option("header", True)
+                    .option("encoding", "UTF-8")
+                    .option("schema", csv_schema)
                     .csv(file_path, header=True)
                     .drop("local_path")
                     .dropDuplicates()
+                    .dropna(subset="short_caption")
                   )
-        df_cleaned = clean_caption(df_file, "caption")
         
+        df_cleaned = clean_caption(df_file, "short_caption")
         (df_cleaned.write
                 .format("mongodb")
                 .option("spark.mongodb.write.connection.uri", db_uri)
@@ -70,7 +83,8 @@ def csv_process_batch(df, batch_id, spark, db_uri):
 def mobile_process_batch(df, batch_id, spark, db_uri):
     formatted_df = format_user_data(df)
     formatted_df = (formatted_df.withColumn("upload_status", upload_image(F.col("image_base64"), F.col("image_name"))))
-    # formatted_df = formatted_df.withColumn("caption", generate_caption(F.col("original_url")))
+    ## TODO: generate caption
+    ##
     formatted_df = clean_caption(formatted_df, 'caption')
 
     (formatted_df.write
