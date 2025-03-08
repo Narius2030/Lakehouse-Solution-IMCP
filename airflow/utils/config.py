@@ -11,6 +11,20 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     # MongoDB Atlas
     DATABASE_URL: str = os.getenv('MONGO_ATLAS_PYTHON')
+    # Gemini
+    GEMINI_API_KEY:str = os.getenv('GEMINI_API_KEY')
+    GEMINI_PROMPT:str = """
+        Describe the image naturally, as if a person were observing and explaining it. Keep it concise (2-3 sentences) but informative.  
+
+        Some aspects to consider if present:  
+        - Traffic: What vehicles are in the scene? Is traffic dense or light?  
+        - Roads: Are they clean, well-maintained, or obstructed? Any road signs or markings?  
+        - Traffic signals: Is the light red, green, or yellow? Are people stopping or moving?  
+        - People: Are there pedestrians? Are they wearing helmets or carrying umbrellas?  
+        - Weather: Is it sunny, rainy, foggy, or nighttime?  
+
+        Respond in Vietnamese naturally, as if describing the scene to someone else.
+    """
     # Kafka
     KAFKA_ADDRESS:str = os.getenv('KAFKA_ADDRESS')
     KAFKA_PORT:str = os.getenv('KAFKA_PORT')
