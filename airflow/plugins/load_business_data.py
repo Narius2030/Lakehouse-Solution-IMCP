@@ -32,6 +32,7 @@ def load_image_storage(file_name:str, partition:str):
     finally:
         os.remove(f'{settings.EXTRACT_FEATURE_PATH}/{file_name}')
 
+
 def process_row(row):
     encoded_caption = TextOperator.encode_caption(row['tokenized_caption'])
     encoded_image = ImageOperator.encode_image(row['original_url'])
@@ -81,23 +82,7 @@ def load_encoded_data():
         sql_opt.write_log('extract_feature', layer='gold', start_time=start_time, status="ERROR", error_message=str(exc), action="insert", affected_rows=affected_rows)
         raise Exception(str(exc))
 
-    
-def encode_image(image_url):
-    pass
-
 
 
 if __name__=='__main__':
-    load_encoded_data()
-    # load_image_storage()
-    
-    
-    # for row in datarows:
-            #     encoded_caption = TextOperator.encode_caption(row['tokenized_caption'])
-            #     encoded_image = ImageOperator.encode_image(row['original_url'])
-            #     encoded_data.append({
-            #         "image_url": row['original_url'],
-            #         "pixel_values": encoded_image['pixel_values'],
-            #         "input_ids": encoded_caption['input_ids'],
-            #         "attention_mask": encoded_caption['attention_mask']
-            #     })
+    load_encoded_data() 

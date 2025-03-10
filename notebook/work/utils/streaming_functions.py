@@ -3,13 +3,12 @@ sys.path.append("./work/imcp")
 
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
+from minio import Minio
+from minio.error import S3Error
 from datetime import datetime
 from utils.schema import minio_schema, image_schema, csv_schema
 from utils.udf_helpers import tokenize_vietnamese, generate_caption, upload_image
 
-
-### Parse value column in kafka message
-###
 def csv_process_stream(stream):
     value_schema = F.schema_of_json(minio_schema)
     stream = (stream
@@ -27,18 +26,14 @@ def mobile_process_stream(stream):
              )
     return stream
 
-
-### Process stream data
-###
 def clean_caption(df, column):
     regex_pattern = r'[!“"”#$%&()*+,./:;<=>?@\[\\\]\^{|}~-]'
     df_cleaned = (df.withColumn(column, F.regexp_replace(F.col(column), regex_pattern, ""))
                     .withColumn(column, F.lower(F.col(column)))
-                    .withColumn(f"{column}_tokens", tokenize_vietnamese(F.col("caption")))
-                    .withColumn("tokenized_caption", F.concat_ws(' ', f"{column}_tokens"))
-                    .withColumn("word_count", F.size(f"{column}_tokens"))
+                    .withColumn("caption_tokens", tokenize_vietnamese(F.col(column)))
+                    .withColumn("tokenized_caption", F.concat_ws(' ', "caption_tokens"))
+                    .withColumn("word_count", F.size("caption_tokens"))
                     .withColumn("created_time", F.lit(datetime.now()))
-                    .drop("image_base64", "image_name")
                  )
     return df_cleaned
 
@@ -47,14 +42,11 @@ def format_user_data(df):
                     .withColumn("source_website", F.lit("Mobile"))
                     .withColumn("search_query", F.lit("None"))
                     .withColumn("resolution", F.col('image_size'))
-                    .withColumn("caption", F.lit(" "))
-                    .drop("image_size")
+                    .withColumn("short_caption", F.lit(" "))
                    )
     return formatted_df
 
 
-### Write stream data
-###
 def csv_process_batch(df, batch_id, spark, db_uri):
     for row in df.collect():
         file_path = f"s3a://{row['Key']}"
@@ -82,10 +74,9 @@ def csv_process_batch(df, batch_id, spark, db_uri):
         
 def mobile_process_batch(df, batch_id, spark, db_uri):
     formatted_df = format_user_data(df)
-    formatted_df = (formatted_df.withColumn("upload_status", upload_image(F.col("image_base64"), F.col("image_name"))))
-    ## TODO: generate caption
-    ##
-    formatted_df = clean_caption(formatted_df, 'caption')
+    formatted_df = (formatted_df.withColumn("upload_status", upload_image(F.col("image_base64"), F.col("image_name")))
+                                .drop("image_base64", "image_name", "image_size")
+                   )
 
     (formatted_df.write
                 .format("mongodb")
