@@ -10,18 +10,17 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     # MongoDB Atlas
     MONGODB_ATLAS_URI:str = os.getenv("MONGO_ATLAS_PYTHON")
-    
     # Kafka
     KAFKA_ADDRESS:str = os.getenv("KAFKA_ADDRESS")
     KAFKA_PORT:str = os.getenv("KAFKA_PORT")
-    
+    # Gemini
+    GEMINI_API_KEY:str = os.getenv('GEMINI_API_KEY')
     # Postgresql
     DB_HOST:str = os.getenv("POSTGRES_HOST")
     DB_PORT:str = os.getenv("POSTGRES_PORT")
     DB_USER:str = os.getenv("POSTGRES_USER")
     DB_PASSWORD:str = os.getenv("POSTGRES_PASSWORD")
     DB_URL:str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}"
-    
     # MinIO
     MINIO_ENDPOINT:str = os.getenv("MINIO_ENDPOINT")
     MINIO_ROOT_USER:str = os.getenv("MINIO_ROOT_USER")

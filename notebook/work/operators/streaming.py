@@ -56,7 +56,7 @@ class SparkStreaming():
         return read_stream
     
     @staticmethod
-    def write_microbatch_in_stream(spark, stream, checkpoint_path, db_uri, process_batch, write_format="console", trigger="10 seconds", output_mode="append"):
+    def write_microbatch_in_stream(spark, stream, checkpoint_path, db_uri, process_batch, gemini_key=None, write_format="console", trigger="10 seconds", output_mode="append"):
         """
         Write the stream back to a file store
 
@@ -77,12 +77,10 @@ class SparkStreaming():
 
         write_stream = (stream.writeStream
                             .format(write_format)
-                            .foreachBatch(lambda df, batch_id: process_batch(df, batch_id, spark, db_uri))
+                            .foreachBatch(lambda df, batch_id: process_batch(df, batch_id, spark, db_uri, gemini_key))
                             .option("checkpointLocation", checkpoint_path)
                             .trigger(processingTime=trigger)
                             .outputMode(output_mode)
                        )
         
         return write_stream
-    
-    

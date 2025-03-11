@@ -1,10 +1,10 @@
 import sys
 sys.path.append("./work/imcp")
 
+from utils.schema import *
 from utils.config import get_settings
 from operators.streaming import SparkStreaming
 from utils.streaming_functions import csv_process_batch, csv_process_stream, mobile_process_stream, mobile_process_batch
-from utils.schema import *
 
 settings = get_settings()
 CSV_DATASET_TOPIC = "minio-parquets"
@@ -16,7 +16,7 @@ MOBILE_CHECKPOINT_PATH = "s3a://lakehouse/streaming/imcp/checkpoints/checkpoint_
 ## TODO: create a SparkSession
 spark = SparkStreaming.get_instance(app_name="Traffic Dataset Spark Streaming")
 
-## TODO: create stream reader
+# ## TODO: create stream reader
 csv_stream = SparkStreaming.create_kafka_read_stream(spark, settings.KAFKA_ADDRESS, settings.KAFKA_PORT, CSV_DATASET_TOPIC)
 processed_csv_stream = csv_process_stream(csv_stream)
 
@@ -35,9 +35,10 @@ write_csv_stream.start()
 write_mobile_stream = SparkStreaming.write_microbatch_in_stream(spark, 
                                                              processed_mobile_stream,
                                                              MOBILE_CHECKPOINT_PATH,
-                                                             settings.MONGODB_ATLAS_URI, 
-                                                             mobile_process_batch, 
-                                                             trigger="10 seconds")
+                                                             settings.MONGODB_ATLAS_URI,
+                                                             mobile_process_batch,
+                                                             gemini_key=settings.GEMINI_API_KEY,
+                                                             trigger="30 seconds")
 write_mobile_stream.start()
 
 
