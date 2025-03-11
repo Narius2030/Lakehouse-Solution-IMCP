@@ -1,8 +1,8 @@
 import sys
 sys.path.append("./work/imcp")
 
-import pyspark.sql.functions as F
-import pyspark.sql.types as T
+import pyspark.sql.functions as F                                                       # type: ignore
+import pyspark.sql.types as T                                                           # type: ignore
 from datetime import datetime
 from utils.schema import minio_schema, image_schema, csv_schema
 from utils.udf_helpers import tokenize_vietnamese, upload_image, caption_generator

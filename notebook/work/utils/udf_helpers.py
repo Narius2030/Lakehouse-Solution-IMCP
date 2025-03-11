@@ -8,8 +8,8 @@ from minio import Minio
 from PIL import Image
 from minio.error import S3Error
 from pyvi import ViTokenizer
-from pyspark.sql.functions import pandas_udf, udf
-from pyspark.sql.types import ArrayType, StringType
+from pyspark.sql.functions import pandas_udf, udf        # type: ignore
+from pyspark.sql.types import ArrayType, StringType      # type: ignore
 
 
 @pandas_udf(ArrayType(StringType()))
