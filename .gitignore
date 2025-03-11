@@ -18,3 +18,4 @@ logs/**
 /*.ipynb
 /temp.json
 /samples/*.ipynb
+/diagram/*
