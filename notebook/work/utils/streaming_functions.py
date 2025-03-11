@@ -3,9 +3,8 @@ sys.path.append("./work/imcp")
 
 import pyspark.sql.functions as F                                                       # type: ignore
 import pyspark.sql.types as T                                                           # type: ignore
-from datetime import datetime
 from utils.schema import minio_schema, image_schema, csv_schema
-from utils.udf_helpers import tokenize_vietnamese, upload_image, caption_generator
+from utils.udf_helpers import tokenize_vietnamese, upload_image, caption_generator, get_current_time
 
 def csv_process_stream(stream):
     """Process streaming data from CSV files.
@@ -56,7 +55,7 @@ def clean_caption(df, column):
                     .withColumn("caption_tokens", tokenize_vietnamese(F.col(column)))
                     .withColumn("tokenized_caption", F.concat_ws(' ', "caption_tokens"))
                     .withColumn("word_count", F.size("caption_tokens"))
-                    .withColumn("created_time", F.lit(datetime.now()))
+                    .withColumn("created_time", get_current_time())
                  )
     return df_cleaned
 
@@ -74,7 +73,7 @@ def format_user_data(df):
                     .withColumn("search_query", F.lit("N/A"))
                     .withColumn("resolution", F.col('image_size'))
                     .withColumn("short_caption", F.lit(" "))
-                    .withColumn("created_time", F.lit(datetime.now()))
+                    .withColumn("created_time", get_current_time())
                    )
     return formatted_df
 

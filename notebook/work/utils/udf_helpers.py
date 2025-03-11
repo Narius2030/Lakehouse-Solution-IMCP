@@ -4,12 +4,23 @@ import base64
 import time
 import pandas as pd
 import google.generativeai as genai
+from datetime import datetime
 from minio import Minio
 from PIL import Image
 from minio.error import S3Error
 from pyvi import ViTokenizer
-from pyspark.sql.functions import pandas_udf, udf        # type: ignore
-from pyspark.sql.types import ArrayType, StringType      # type: ignore
+from pyspark.sql.functions import pandas_udf, udf                       # type: ignore
+from pyspark.sql.types import ArrayType, StringType, TimestampType      # type: ignore
+
+
+@udf(TimestampType())
+def get_current_time():
+    """Get the current time.
+
+    Returns:
+        str: Current time in the format "YYYY-MM-DD HH:MM:SS".
+    """
+    return datetime.now()
 
 
 @pandas_udf(ArrayType(StringType()))
