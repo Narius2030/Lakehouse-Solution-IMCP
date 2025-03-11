@@ -6,6 +6,10 @@
 
 ![image](https://github.com/user-attachments/assets/923a659b-0401-4c68-a28b-704d6db14098)
 
+Real-time Dashboard for ingested data
+
+![eda](https://github.com/user-attachments/assets/e6d79c8e-3637-482f-b988-b6afe52f3627)
+
 
 ## Detailed Architecture
 
