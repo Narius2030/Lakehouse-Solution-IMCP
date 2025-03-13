@@ -35,9 +35,9 @@ def load_image_storage(file_name:str, partition:str):
 
 def process_row(row):
     encoded_caption = TextOperator.encode_caption(row['tokenized_caption'])
-    encoded_image = ImageOperator.encode_image(row['original_url'])
+    encoded_image = ImageOperator.encode_image(row['s3_url'])
     return {
-        "image_url": row['original_url'],
+        "image_url": row['s3_url'],
         "pixel_values": encoded_image['pixel_values'],
         "input_ids": encoded_caption['input_ids'],
         "attention_mask": encoded_caption['attention_mask']
@@ -51,7 +51,7 @@ def load_encoded_data():
     try:
         partition = datetime.now().strftime("%Y-%m-%d")
         metadata = {
-            "root_url": f"{settings.MINIO_URL}/{partition}/encoded-data", 
+            "root_url": f"{settings.MINIO_URL}/encoded-data/{partition}", 
             "date": datetime.today()
         }
         for batch in sql_opt.data_generator('refined', latest_time=latest_time, batch_size=10):

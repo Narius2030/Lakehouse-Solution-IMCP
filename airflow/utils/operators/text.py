@@ -92,6 +92,5 @@ class TextOperator():
                 
             except Exception as e:
                 if attempt == max_retries - 1:  # Last attempt
-                    print(f"Error generating content: {e}")
                     return None
                 time.sleep(2 * (attempt + 1))  # Exponential backoff

@@ -1,6 +1,7 @@
 import sys
 sys.path.append('./airflow')
 
+import hashlib
 import pandas as pd
 import polars as pl
 import itertools
@@ -23,33 +24,31 @@ sql_opt = SQLOperators('imcp', settings)
 
 def process_row(data, params, settings, genai):
     new_data = []
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    image_name = f'image_{timestamp}.jpg'
-    data['s3_url'] =  f'{settings.AUGMENTED_IMAGE_URL}/image_{timestamp}.jpg'
-    # original image
+    md5_hash = hashlib.md5(data["original_url"].encode()).hexdigest()
+    image_name = f'{md5_hash}.jpg'
+    data['s3_url'] =  f'{settings.AUGMENTED_IMAGE_URL}/{image_name}'
+
     original_image, is_error = ImageOperator.image_from_url(data['original_url'])
     if is_error == False:
+        ## TODO: Upload original image
         ImageOperator.upload_image(original_image, image_name, params['bucket_name'], params['file_image_path'], settings)
-        ## TODO: augment original image
         new_data.append(data)
         augmented_images = ImageOperator.augment_image(original_image)
-        # Lưu các ảnh augmented và thêm vào DataFrame
+
         for aug_idx, aug_image in enumerate(augmented_images):
             temp = data.copy()
             try:
-                new_image_name = f'image_{timestamp}_{aug_idx}.jpg'
-                ## TODO: Thêm vào danh sách dữ liệu mới với caption giống ảnh gốc
+                new_image_name = f'{md5_hash}_{aug_idx}.jpg'
+                ## TODO: Upload augmented image
                 ImageOperator.upload_image(aug_image, new_image_name, params['bucket_name'], params['file_image_path'], settings)
-                temp['s3_url'] = f'{settings.AUGMENTED_IMAGE_URL}/image_{timestamp}_{aug_idx}.jpg'
-                ## TODO: Tạo caption mới cho mỗi ảnh augmented
+                temp['s3_url'] = f'{settings.AUGMENTED_IMAGE_URL}/{new_image_name}'
+                ## TODO: Generate caption
                 short_caption = TextOperator.caption_generator(genai, data['s3_url'], settings.GEMINI_PROMPT)
                 temp['short_caption'] = short_caption
                 new_data.append(temp)
             except Exception as e:
-                print(f"Lỗi khi lưu ảnh augmented: {str(e)}")
+                print(f"Error when uploading augmented image: {str(e)}")
                 continue
-            
-    print("HEYY")
     return new_data
 
 
@@ -72,6 +71,7 @@ def load_refined_data(params):
             new_data = refined_df.to_dicts()
             mongo_operator.insert_batches('refined', new_data)
             print("SUCCESS with", len(new_data))
+            affected_rows += len(new_data)
             break
         # Write logs
         sql_opt.write_log('augmented_metadata', layer='silver', start_time=start_time, status="SUCCESS", action="insert", affected_rows=affected_rows)
