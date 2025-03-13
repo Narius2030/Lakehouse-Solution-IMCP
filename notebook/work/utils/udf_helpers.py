@@ -33,13 +33,14 @@ def tokenize_vietnamese(text_series: pd.Series) -> pd.Series:
     Returns:
         pd.Series: Series of tokenized text.
     """
-    return (text_series.fillna("")
-                    .apply(lambda text: ViTokenizer.tokenize(text).split())
+    return (text_series
+                .fillna("")
+                .apply(lambda text: ViTokenizer.tokenize(text).split())
             )
 
     
 @udf(StringType())
-def upload_image(image_base64, object_name, bucket_name="mlflow"):
+def upload_image(image_base64, object_name, bucket_name="lakehouse"):
     """Upload an image to MinIO.
 
     Args:
@@ -62,7 +63,7 @@ def upload_image(image_base64, object_name, bucket_name="mlflow"):
         stream_bytes = io.BytesIO(image_binary)
         minio_client.put_object(
             bucket_name = bucket_name,
-            object_name = f"user-data/images/{object_name}",
+            object_name = f"imcp/user-data/images/{object_name}",
             data = stream_bytes,
             length = stream_bytes.getbuffer().nbytes,
             content_type="image/jpeg"
