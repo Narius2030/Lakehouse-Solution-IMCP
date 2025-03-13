@@ -84,8 +84,8 @@ def load_refined_data(params):
 
 if __name__=='__main__':
     params = {
-        "bucket_name": "mlflow",
-        "file_image_path": "augmented/images"
+        "bucket_name": "lakehouse",
+        "file_image_path": "imcp/augmented/images"
     }
     
     load_refined_data(params)

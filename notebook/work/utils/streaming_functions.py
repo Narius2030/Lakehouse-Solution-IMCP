@@ -68,7 +68,7 @@ def format_user_data(df):
     Returns:
         DataFrame with formatted user metadata.
     """
-    formatted_df = (df.withColumn("original_url", F.concat(F.lit("http://160.191.244.13:9000/mlflow/user-data/images/"), F.col('image_name')))
+    formatted_df = (df.withColumn("original_url", F.concat(F.lit("http://160.191.244.13:9000/lakehouse/imcp/user-data/images/"), F.col('image_name')))
                     .withColumn("source_website", F.lit("Mobile"))
                     .withColumn("search_query", F.lit("N/A"))
                     .withColumn("resolution", F.col('image_size'))

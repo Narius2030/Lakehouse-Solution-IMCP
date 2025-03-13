@@ -26,7 +26,7 @@ minio_operator = MinioStorageOperator(endpoint=f'{settings.MINIO_HOST}:{settings
 
 def load_image_storage(file_name:str, partition:str):
     try:
-        minio_operator.upload_file('mlflow', f'/encoded-data/{partition}/{file_name}', f'{settings.EXTRACT_FEATURE_PATH}/{file_name}')
+        minio_operator.upload_file('lakehouse', f'imcp/encoded-data/{partition}/{file_name}', f'{settings.EXTRACT_FEATURE_PATH}/{file_name}')
     except:
         raise Exception('Upload extracted feature file failed!')
     finally:
