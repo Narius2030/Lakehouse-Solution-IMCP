@@ -85,7 +85,7 @@ def load_refined_data(params):
 if __name__=='__main__':
     params = {
         "bucket_name": "lakehouse",
-        "file_image_path": "imcp/augmented/images"
+        "file_image_path": "imcp/augmented-data/images"
     }
     
     load_refined_data(params)
