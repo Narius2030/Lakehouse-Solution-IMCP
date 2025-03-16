@@ -1,5 +1,3 @@
-import pandas as pd
-
 class QueryTemplate:
     def __init__(self, table_name, schema=None):
         self.table_name = table_name

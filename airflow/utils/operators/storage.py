@@ -1,3 +1,4 @@
+import logging
 from minio import Minio
 from minio.error import S3Error
                 
@@ -24,6 +25,29 @@ class MinioStorageOperator:
         objects = self.client.list_objects(bucket_name, prefix=prefix)
         return objects
         
+        
+    def is_bucket_exists(self, bucket_name: str) -> bool:
+        """
+        Check if a bucket exists in MinIO.
+        
+        Args:
+            bucket_name (str): Name of the bucket to check
+            
+        Returns:
+            bool: True if bucket exists, False otherwise
+        """
+        try:
+            exists = self.client.bucket_exists(bucket_name)
+            if exists:
+                logging.info(f"Bucket '{bucket_name}' exists.")
+            else:
+                logging.info(f"Bucket '{bucket_name}' does not exist.")
+            return exists
+            
+        except S3Error as e:
+            logging.error(f"Error checking bucket existence: {str(e)}")
+            return False
+
 
     def upload_file(self, bucket_name, object_name, file_path):
         """
@@ -39,6 +63,7 @@ class MinioStorageOperator:
         except S3Error as e:
             print(f"Lỗi khi upload tệp: {str(e)}")
 
+
     def download_file(self, bucket_name, object_name, download_path):
         """
         Download tệp từ MinIO về máy.
@@ -52,6 +77,7 @@ class MinioStorageOperator:
             print(f"Download thành công: {object_name}")
         except S3Error as e:
             print(f"Lỗi khi download tệp: {str(e)}")
+
 
     def create_bucket(self, bucket_name):
         """
@@ -67,6 +93,7 @@ class MinioStorageOperator:
                 print(f"Bucket {bucket_name} đã tồn tại.")
         except S3Error as e:
             print(f"Lỗi khi tạo bucket: {str(e)}")
+    
         
     def upload_object_bytes(self, objec_data, bucket_name:str, object_name:str, content_type:str):
         """
@@ -76,8 +103,6 @@ class MinioStorageOperator:
         :param bucket_name: tên bucket
         :param object_name: đường dẫn tới tên của đối tượng trên MinIO
         """
-        # image_bytes = io.BytesIO(objec_data)
-        # Upload dữ liệu từ BytesIO lên MinIO
         try:
             self.client.put_object(
                 bucket_name = bucket_name,
@@ -89,6 +114,7 @@ class MinioStorageOperator:
             # print(f"Successfully uploaded {object_name} to {bucket_name}!")
         except S3Error as err:
             print(f"Error uploading file: {err}")
+            
             
     def load_object_bytes(self, bucket_name:str, object_name:str, version_id=None):
         """
@@ -107,15 +133,3 @@ class MinioStorageOperator:
         except Exception as e:
             print(f"Error loading object from MinIO: {str(e)}")
             return None
-        
-    def create_presigned_url(self, bucket_name, object_name) -> str:
-        """
-        Create new *Presigned URL* in MinIO.
-
-        :param bucket_name: Name of bucket containing that object.
-        """
-        return self.client.get_presigned_url(
-            method='GET',
-            bucket_name=bucket_name,
-            object_name=object_name
-        )

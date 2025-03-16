@@ -47,7 +47,7 @@ class SQLOperators:
         except Exception as ex:
             raise Exception(f"====> Can't execute {query} - {str(ex)}")
     
-    def data_generator(self, table_name, columns=None, latest_time="1970-01-01T00:00:00.000+00:00", batch_size=10000):
+    def data_generator(self, table_name, columns=None, latest_time="1970-01-01 00:00:00", batch_size=10000):
         query = QueryTemplate(table_name).create_query_select(columns, latest_time)
         try:
             batch = []
