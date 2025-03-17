@@ -25,16 +25,13 @@ class Settings(BaseSettings):
 
         Respond in Vietnamese naturally, as if describing the scene to someone else.
     """
-    # Kafka
-    KAFKA_ADDRESS:str = os.getenv('KAFKA_ADDRESS')
-    KAFKA_PORT:str = os.getenv('KAFKA_PORT')
     # MinIO
     MINIO_HOST:str = os.getenv('MINIO_HOST')
     MINIO_PORT:str = os.getenv('MINIO_PORT')
     MINIO_USER:str = os.getenv('MINIO_USER')
     MINIO_PASSWD:str = os.getenv('MINIO_PASSWD')
     MINIO_URL:str = os.getenv('MINIO_URL')
-    AUGMENTED_IMAGE_URL:str = f"{MINIO_URL}/augmented/images"
+    AUGMENTED_IMAGE_URL:str = f"{MINIO_URL}/augmented-data/images"
      # Trino
     TRINO_USER:str = os.getenv('TRINO_USER')
     TRINO_HOST:str = os.getenv('TRINO_HOST')

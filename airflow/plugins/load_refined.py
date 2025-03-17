@@ -1,15 +1,15 @@
 import sys
-sys.path.append('./airflow')
+sys.path.append('/opt/airflow')
 
 import hashlib
 import pandas as pd
 import polars as pl
 import itertools
+import logging
 import concurrent.futures as cf
 import google.generativeai as genai
 from tqdm import tqdm
-from datetime import datetime
-from utils.config import get_settings
+from utils.setting import get_settings
 from utils.operators.mongodb import MongoDBOperator
 from utils.operators.trinodb import SQLOperators
 from utils.operators.text import TextOperator
@@ -57,7 +57,7 @@ def load_refined_data(params):
     affected_rows = 0
     latest_time = sql_opt.get_latest_fetching_time('silver', 'augmented_metadata')
     try:
-        for batch in sql_opt.data_generator('raw', latest_time=latest_time, batch_size=10):
+        for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=10)):
             datarows = list(batch)
             args = [(data, params, settings, genai) for data in tqdm(datarows)]
             with cf.ThreadPoolExecutor(max_workers=3) as executor:
@@ -70,7 +70,7 @@ def load_refined_data(params):
             refined_df = TextOperator.scaling_data(refined_df, ['original_url', 's3_url', 'short_caption', 'tokenized_caption', 'created_time'])
             new_data = refined_df.to_dicts()
             mongo_operator.insert_batches('refined', new_data)
-            print("SUCCESS with", len(new_data))
+            logging.info(f"SUCCESS WITH {len(new_data)} ROWS IN BATCH {batch_idx}")
             affected_rows += len(new_data)
             break
         # Write logs

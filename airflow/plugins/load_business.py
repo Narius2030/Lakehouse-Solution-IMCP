@@ -1,12 +1,12 @@
 import sys
-sys.path.append('./airflow')
+sys.path.append('/opt/airflow')
 
 import os
 import pickle
 import pandas as pd
 import concurrent.futures as cf
 from datetime import datetime
-from utils.config import get_settings
+from utils.setting import get_settings
 from utils.operators.text import TextOperator
 from utils.operators.image import ImageOperator
 from utils.operators.trinodb import SQLOperators
@@ -63,7 +63,7 @@ def load_encoded_data():
                 encoded_data = list(executor.map(process_row, datarows))
             
             file_name = f"encoded_data_{timestamp}.pkl"
-            with open(f"./airflow/data/{file_name}", "wb") as f:
+            with open(f"/opt/airflow/data/{file_name}", "wb") as f:
                 pickle.dump(encoded_data, f)
             load_image_storage(file_name, partition)
             
@@ -73,13 +73,13 @@ def load_encoded_data():
             break
         # write logs
         metadata["files"] = file_names
-        metadata["encoding-type"] = "text"
+        metadata["encoding-type"] = ["text", "image"]
         metadata["total_captions"] = affected_rows
         mongo_operator.insert_batches('featured', [metadata])
-        sql_opt.write_log('extract_feature', layer='gold', start_time=start_time, status="SUCCESS", action="insert", affected_rows=affected_rows)
+        sql_opt.write_log('encoded_data', layer='gold', start_time=start_time, status="SUCCESS", action="insert", affected_rows=affected_rows)
         
     except Exception as exc:
-        sql_opt.write_log('extract_feature', layer='gold', start_time=start_time, status="ERROR", error_message=str(exc), action="insert", affected_rows=affected_rows)
+        sql_opt.write_log('encoded_data', layer='gold', start_time=start_time, status="ERROR", error_message=str(exc), action="insert", affected_rows=affected_rows)
         raise Exception(str(exc))
 
 

@@ -2,19 +2,19 @@ from airflow import DAG                                                         
 from airflow.utils.dates import days_ago                                                                #type: ignore
 from airflow.utils.edgemodifier import Label                                                            #type: ignore
 from airflow.utils.task_group import TaskGroup                                                          #type: ignore  
-from airflow.operators.python_operator import PythonOperator, BranchPythonOperator                      #type: ignore
+from airflow.operators.python_operator import PythonOperator                                            #type: ignore
 from airflow.operators.dummy import DummyOperator                                                       #type: ignore
 from airflow.models.variable import Variable                                                            #type: ignore
 from trino_operator import TrinoOperator                                                                #type: ignore
-from load_refined import load_refined_data                                                              #type: ignore
-from load_business import load_encoded_data                                                             #type: ignore
+from load_augmented import load_refined_data                                                            #type: ignore
+from load_encoded import load_encoded_data                                                              #type: ignore
 from utils.operators.storage import MinioStorageOperator
 import logging
 
-def check_collection_result(**context):
-    ti = context['task_instance']
-    result = ti.xcom_pull(task_ids=f"check_collection_existence")
-    
+def check_collection_result(**kwargs):
+    ti = kwargs['ti']
+    result = ti.xcom_pull(task_ids=f"validate_configs.check_collection_existence")
+    logging.info(f"XCom result: {result}")
     # result will be a tuple with count value
     count = result[0] if result else 0
     if count != 4:  # Collection doesn't exist
@@ -107,7 +107,6 @@ with DAG(
     encode_data = PythonOperator(
         task_id = 'encode_data',
         python_callable = load_encoded_data,
-        do_xcom_push=True,
         trigger_rule='all_success',
         dag = dag
     )
@@ -115,4 +114,4 @@ with DAG(
 
 
 # pipeline
-start >> validate_connections >> Label("refine data") >> augment_data >> Label("extract feature") >> encode_data >> end
+start >> validate_connections >> Label("augment") >> augment_data >> Label("encode") >> encode_data >> end

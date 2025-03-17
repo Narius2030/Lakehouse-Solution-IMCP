@@ -3,13 +3,12 @@ version: "3.9"
 services:
   # Airflow setup
   airflow:
-    container_name: streamify-airflow
+    container_name: imcp-airflow
     build:
       context: ./
       dockerfile: ./Dockerfile
     volumes:
       - ./:/opt/airflow
-      - ../profiles.yml:/home/airflow/.dbt/profiles.yml
     ports:
       - "8081:8080"
     command: airflow standalone

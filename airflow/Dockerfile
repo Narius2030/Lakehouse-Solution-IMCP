@@ -1,7 +1,5 @@
 FROM apache/airflow:2.9.2-python3.11
 
-# ENV AIRFLOW__WEBSERVER__SECRET_KEY=buiducnhan15122003
-
 USER root
 RUN apt update && \
     apt-get -y install libpq-dev gcc && \

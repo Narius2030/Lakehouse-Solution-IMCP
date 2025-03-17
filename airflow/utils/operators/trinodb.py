@@ -2,7 +2,7 @@ import sys
 sys.path.append('./')
 
 from utils.operators.support_query import QueryTemplate
-from utils.config import Settings
+from utils.setting import Settings
 from contextlib import closing
 from datetime import datetime
 import trino
