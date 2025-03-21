@@ -10,14 +10,13 @@ Real-time Dashboard for ingested data
 
 ![eda](https://github.com/user-attachments/assets/e6d79c8e-3637-482f-b988-b6afe52f3627)
 
-
 ## Detailed Architecture
 
-![image](https://github.com/user-attachments/assets/64b1f8b2-22ce-4cdd-ac63-c8855883fbe0)
+![image](https://github.com/user-attachments/assets/da4c583d-70fd-440d-b2cc-9ab08cf92fd2)
 
 ## MLOps Cycle
 
-![image](https://github.com/user-attachments/assets/8c400e4c-48c5-4352-aa71-e2a4990cea85)
+![image](https://github.com/user-attachments/assets/31effa68-39dc-4c92-860a-074c959b911a)
 
 # FastAPI-based Microservice
 
