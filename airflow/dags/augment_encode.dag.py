@@ -1,3 +1,4 @@
+from datetime import timedelta
 from airflow import DAG                                                                                 #type: ignore
 from airflow.utils.dates import days_ago                                                                #type: ignore
 from airflow.utils.edgemodifier import Label                                                            #type: ignore
@@ -54,7 +55,8 @@ with DAG(
         'email_on_failure': True,
         'email_on_success': True,
         'email_on_retry': True,
-        'email': ['nhanbui15122003@gmail.com', 'dtptrieuphidtp@gmail.com', '159.thiennhan@gmail.com']
+        'email': ['nhanbui15122003@gmail.com', 'dtptrieuphidtp@gmail.com', '159.thiennhan@gmail.com'],
+        'execution_timeout': timedelta(minutes=60)
     },
     catchup=False
 ) as dag:

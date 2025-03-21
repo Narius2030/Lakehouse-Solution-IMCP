@@ -2,7 +2,7 @@
 /.vscode/**
 # /airflow/config/**
 /data/mongodb/**
-/airflow/airflow.cfg
+# /airflow/airflow.cfg
 /airflow/airflow.db
 /airflow/airflow.db-journal
 /airflow/airflow-webserver.pid
