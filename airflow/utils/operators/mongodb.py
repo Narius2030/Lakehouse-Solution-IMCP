@@ -195,3 +195,23 @@ class MongoDBOperator():
                 if batch != []:
                     print("Loading...", len(batch))
                     dbconn[collection].insert_many(batch)
+                    
+    def delete_null_from_latest(self, table_name:str):
+        with pymongo.MongoClient(self.__connstr) as client:
+            db = client[self.dbname]
+            end_time_2nd = (db.audit
+                            .find({"table_name": table_name, "status": "SUCCESS"})
+                            .sort("end_time", -1)
+                            .limit(1)
+                            .skip(1)
+                            .next()["end_time"]
+                        )
+
+            # Xóa các bản ghi
+            result = db.refined.delete_many({
+                "created_time": {"$gte": end_time_2nd},
+                "short_caption": None
+            })
+            print(end_time_2nd)
+            return result.deleted_count
+            

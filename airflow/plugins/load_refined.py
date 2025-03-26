@@ -6,6 +6,8 @@ import pandas as pd
 import polars as pl
 import itertools
 import logging
+import time
+import random
 import concurrent.futures as cf
 import google.generativeai as genai
 from tqdm import tqdm
@@ -46,6 +48,8 @@ def process_row(data, params, settings, genai):
                 short_caption = TextOperator.caption_generator(genai, data['s3_url'], settings.GEMINI_PROMPT)
                 temp['short_caption'] = short_caption
                 new_data.append(temp)
+                time.sleep(random.uniform(1, 5))
+                
             except Exception as e:
                 print(f"Error when uploading augmented image: {str(e)}")
                 continue

@@ -2,6 +2,7 @@ import sys
 sys.path.append('./airflow')
 import polars as pl
 import requests
+import logging
 import time
 from PIL import Image
 from io import BytesIO
@@ -88,9 +89,11 @@ class TextOperator():
                     return None
 
                 response = model.generate_content([prompt, image])
+                # if response.text is None:
+                #     raise Exception(f"Cannot generate caption for image url {image_url} at attempt {attempt}/{max_retries}")
                 return response.text
                 
             except Exception as e:
-                if attempt == max_retries - 1:  # Last attempt
+                if attempt == max_retries - 1:
                     return None
-                time.sleep(2 * (attempt + 1))  # Exponential backoff
+                time.sleep(2 * (attempt + 1))

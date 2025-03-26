@@ -9,6 +9,7 @@ from airflow.models.variable import Variable                                    
 from trino_operator import TrinoOperator                                                                #type: ignore
 from load_augmented import load_refined_data                                                            #type: ignore
 from load_encoded import load_encoded_data                                                              #type: ignore
+from clean_staging import clean_null_data                                                               #type: ignore
 from utils.operators.storage import MinioStorageOperator
 import logging
 
@@ -94,16 +95,27 @@ with DAG(
         )
     
     # Silver process
-    augment_data = PythonOperator(
-        task_id = 'augment_data',
-        params = {
-            "bucket_name": Variable.get("LAKEHOUSE_BUCKET", default_var="lakehouse"),
-            "file_image_path": Variable.get("AUGMENTED_IMAGE_PATH", default_var="imcp/augmented-data/images")
-        },
-        python_callable = load_refined_data,
-        trigger_rule='all_success',
-        dag = dag
-    )
+    with TaskGroup("data_augmentation", tooltip="Tasks for augmenting images") as data_augmentation:
+        augment_data = PythonOperator(
+            task_id = 'augment_data',
+            params = {
+                "bucket_name": Variable.get("LAKEHOUSE_BUCKET", default_var="lakehouse"),
+                "file_image_path": Variable.get("AUGMENTED_IMAGE_PATH", default_var="imcp/augmented-data/images")
+            },
+            python_callable = load_refined_data,
+            trigger_rule='all_success',
+            dag = dag
+        )
+        cleaning_augmented_data = PythonOperator(
+            task_id = 'clean_null_data',
+            params = {
+                "table_name": Variable.get("CLEANED_TABLE_NAME", default_var="augmented_metadata")
+            },
+            python_callable=clean_null_data,
+            trigger_rule='all_success',
+            dag=dag
+        )
+        augment_data >> cleaning_augmented_data
     
     # Gold process
     encode_data = PythonOperator(
@@ -116,4 +128,4 @@ with DAG(
 
 
 # pipeline
-start >> validate_connections >> Label("augment") >> augment_data >> Label("encode") >> encode_data >> end
+start >> validate_connections >> Label("augment") >> data_augmentation >> Label("encode") >> encode_data >> end
