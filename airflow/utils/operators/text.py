@@ -83,7 +83,7 @@ class TextOperator():
         """Get prediction with retries"""
         for attempt in range(max_retries):
             try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-2.0-flash')
                 image = TextOperator.load_image_from_url(image_url)
                 if image is None:
                     return None
@@ -97,3 +97,40 @@ class TextOperator():
                 if attempt == max_retries - 1:
                     return None
                 time.sleep(2 * (attempt + 1))
+                
+
+
+if __name__ == "__main__":
+    import google.generativeai as genai
+    from utils.setting import get_settings
+    
+    settings = get_settings()
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    
+    # Bạn là một người đang trực tiếp tham gia giao thông tại Việt Nam. Hãy mô tả ngắn gọn tình huống giao thông hiện tại, tập trung vào các phương tiện chính, con người và môi trường xung quanh. Đảm bảo mô tả rõ ràng, dễ hiểu, không quá 25 từ, giúp người khiếm thị nhanh chóng hình dung bối cảnh giao thông.
+    promt = """
+        Bạn là một người khiếm thị đang nghe mô tả về tình huống giao thông xung quanh. Hãy mô tả thành đoạn văn ngắn gọn và khách quan các tiêu chí sau:  
+        **Tình trạng giao thông**: 
+            - Mô tả tình trạng giao thông hiện tại bằng một câu đơn, tập trung vào phương tiện chính, biển báo giao thông, đèn tín hiệu, con người và bối cảnh trong tấm hình.  
+        **Vị trí các đối tượng cố định**: 
+            - Chỉ rõ vị trí "trái", "phải", "phía trước", "chính giữa", "bên lề"... của các đối tượng cố định như biển báo, đèn tín hiệu, chốt cảnh sát...   
+            - Nếu có các biển báo giao thông hoặc đèn tín hiệu giao thông, nêu rõ nội dung của chúng.
+        **Làn đường và hướng di chuyển**: 
+            - Chỉ rõ phương tiện di chuyển (cùng chiều hoặc ngược chiều) so với tôi (góc nhìn của ảnh).
+            - Nếu phương tiện băng ngang, nêu rõ hướng di chuyển ("từ trái sang phải", "từ phải sang trái").
+        **Góc nhìn trong ảnh**: 
+            - Xác định vị trí hiện tại so với góc chụp ảnh (ví dụ: đứng trên vỉa hè, giữa đường, hay nhìn từ xa). Xưng hô "bạn".
+        **Khả năng di chuyển an toàn**:
+            - Xác định chính xác vị trí "trái", "phải", "phía trước" hoặc "chính giữa" cho làn đường có vỉa hè, vạch qua đường cho người đi bộ hoặc làn đường không có vật cản ảnh hưởng đến việc di chuyển an toàn.
+        **Kèm theo các ràng buộc điều kiện sau**:
+            - Chỉ sử dụng câu đơn có chủ ngữ, động từ, bổ ngữ rõ ràng. 
+            - Sử dụng câu tự nhiên, có thể nói thành lời mà không gây khó hiểu
+            - Không mô tả thông tin hiển nhiên.
+            - Tách ý bằng dấu chấm (.) và không dùng dấu phẩy (,) hoặc chấm phẩy (;) để nối câu.
+            - Không thêm cảm xúc hay suy đoán. Không quá 20 từ. Nếu dài hơn, hãy rút gọn.
+            - Các câu phải nối tiếp nhau trên cùng một dòng, không xuống dòng mới.
+    """
+    caption = TextOperator.caption_generator(genai=genai, 
+                                   image_url="https://laodongthudo.vn/stores/news_dataimages/quocdai/112016/18/09/2249_VHdibo-2.jpg",
+                                   prompt=promt)
+    print(caption)
