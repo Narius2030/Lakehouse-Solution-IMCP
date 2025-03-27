@@ -111,7 +111,7 @@ def caption_generator(gemini_key, image_url, max_retries=3):
     """
     for attempt in range(max_retries):
         try:
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             response = requests.get(image_url, timeout=10, verify=False)  # Bỏ qua SSL verify
             response.raise_for_status()
             image = Image.open(io.BytesIO(response.content))
