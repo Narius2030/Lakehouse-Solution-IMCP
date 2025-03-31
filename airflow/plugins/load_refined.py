@@ -44,11 +44,11 @@ def process_row(data, params, settings, genai):
                 ## TODO: Upload augmented image
                 ImageOperator.upload_image(aug_image, new_image_name, params['bucket_name'], params['file_image_path'], settings)
                 temp['s3_url'] = f'{settings.AUGMENTED_IMAGE_URL}/{new_image_name}'
-                ## TODO: Generate caption
-                short_caption = TextOperator.caption_generator(genai, data['s3_url'], settings.GEMINI_PROMPT)
-                temp['short_caption'] = short_caption
+                # ## TODO: Generate caption
+                # short_caption = TextOperator.caption_generator(genai, data['s3_url'], settings.GEMINI_PROMPT)
+                # temp['short_caption'] = short_caption
                 new_data.append(temp)
-                time.sleep(random.uniform(1, 5))
+                time.sleep(random.uniform(0.01, 0.05))
                 
             except Exception as e:
                 print(f"Error when uploading augmented image: {str(e)}")
