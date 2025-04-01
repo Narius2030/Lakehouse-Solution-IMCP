@@ -8,7 +8,8 @@
 
 Real-time Dashboard for ingested data
 
-![eda](https://github.com/user-attachments/assets/e6d79c8e-3637-482f-b988-b6afe52f3627)
+![imcp-eda-2025-03-31T16-07-27 174Z](https://github.com/user-attachments/assets/7995702a-c71f-47fc-8b9f-1e38b88e4d90)
+
 
 ## Detailed Architecture
 
