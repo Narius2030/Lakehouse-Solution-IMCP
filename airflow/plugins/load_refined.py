@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/opt/airflow')
+sys.path.append('./airflow')
 
 import hashlib
 import pandas as pd
@@ -61,7 +61,7 @@ def load_refined_data(params):
     affected_rows = 0
     latest_time = sql_opt.get_latest_fetching_time('silver', 'augmented_metadata')
     try:
-        for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=10)):
+        for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=1000)):
             datarows = list(batch)
             args = [(data, params, settings, genai) for data in tqdm(datarows)]
             with cf.ThreadPoolExecutor(max_workers=3) as executor:

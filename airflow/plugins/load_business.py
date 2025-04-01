@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/opt/airflow')
+sys.path.append('./airflow')
 
 import os
 import pickle

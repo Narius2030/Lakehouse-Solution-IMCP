@@ -27,7 +27,7 @@ class TextOperator():
 
     @staticmethod
     def clean_caption(df:pl.DataFrame):
-        regex_pattern = r'[!“"”#$%&()*+,./:;<=>?@\[\\\]\^{|}~-]'
+        regex_pattern = r'[!“"”#$%&()*+/:;<=>?@\[\\\]\^{|}~-]'
         cleaned_df = df.with_columns(
             pl.lit(datetime.now()).alias("created_time"),
             pl.col("short_caption").str.to_lowercase().alias("short_caption"),

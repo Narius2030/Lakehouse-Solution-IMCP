@@ -9,42 +9,7 @@ from airflow.models.variable import Variable                                    
 from trino_operator import TrinoOperator                                                                #type: ignore
 from load_augmented import load_refined_data                                                            #type: ignore
 from load_encoded import load_encoded_data                                                              #type: ignore
-from clean_staging import clean_null_data                                                               #type: ignore
-from utils.operators.storage import MinioStorageOperator
-import logging
-
-def check_collection_result(**kwargs):
-    ti = kwargs['ti']
-    result = ti.xcom_pull(task_ids=f"validate_configs.check_collection_existence")
-    logging.info(f"XCom result: {result}")
-    # result will be a tuple with count value
-    count = result[0] if result else 0
-    if count != 4:  # Collection doesn't exist
-        raise Exception("Collections do not exist")
-    logging.info(f"Collections exist")
-    return {
-        "status": "success",
-        "message": "Collections exist",
-        "count": count
-    }
-
-def check_bucket_result():
-    minio_operator = MinioStorageOperator(
-        endpoint=Variable.get("MINIO_ENDPOINT", default_var="160.191.244.13:9000"),
-        access_key=Variable.get("MINIO_ACCESS_KEY", default_var="minio"),
-        secret_key=Variable.get("MINIO_SECRET_KEY", default_var="minio123"),
-        secure=False
-    )
-    
-    bucket_name = Variable.get("LAKEHOUSE_BUCKET", default_var="lakehouse")
-    if not minio_operator.is_bucket_exists(bucket_name):
-        raise Exception(f"Bucket {bucket_name} does not exist")
-    logging.info(f"Bucket {bucket_name} exists")
-    return {
-        "status": "success",
-        "message": f"Bucket {bucket_name} exists",
-        "bucket_name": bucket_name
-    }
+from clean_staging import clean_null_data, check_collection_result, check_bucket_result                 #type: ignore
 
 
 # DAGs
@@ -67,8 +32,6 @@ with DAG(
     
     # Validate Connection
     with TaskGroup("validate_configs", tooltip="Tasks for validations before running") as validate_connections:
-        # skip_task = DummyOperator(task_id="skip_task")
-        
         count_existing_collection = TrinoOperator(
             task_id="check_collection_existence",
             trino_conn_id="trino_conn",
