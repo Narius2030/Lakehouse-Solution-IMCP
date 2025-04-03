@@ -1,3 +1,10 @@
+# References
+
+[General Architecture of Data Lake](general-architecture-of-data-lake)
+[Real-time Monitoring & Scheduling](real-time-monitoring-&-scheduling)
+[MLOps Cycle](mlops-cycle)
+[FastAPI-based Microservice](fastAPI-based-microservice)
+
 # General Architecture of Data Lake
 
 - Builded a Data Lake following Medallion architecture with `catalog layer` and `storage layer` for storing image and its metadata
@@ -6,16 +13,21 @@
 
 ![image](https://github.com/user-attachments/assets/923a659b-0401-4c68-a28b-704d6db14098)
 
-Real-time Dashboard for ingested data
-
-![imcp-eda-2025-03-31T16-07-27 174Z](https://github.com/user-attachments/assets/7995702a-c71f-47fc-8b9f-1e38b88e4d90)
-
-
-## Detailed Architecture
+Detail Functional Layers
 
 ![image](https://github.com/user-attachments/assets/da4c583d-70fd-440d-b2cc-9ab08cf92fd2)
 
-## MLOps Cycle
+# Real-time Monitoring & Scheduling
+
+Real-time Dashboard for ingested data
+
+![imcp-eda-2025-04-03T13-49-10 351Z](https://github.com/user-attachments/assets/782f5867-8473-4c1f-8f0f-144c6fd78099)
+
+Schedule tasks on Airflow
+
+![image](https://github.com/user-attachments/assets/d77acb2e-6420-4577-81a8-6496c7f2ea77)
+
+# MLOps Cycle
 
 ![image](https://github.com/user-attachments/assets/31effa68-39dc-4c92-860a-074c959b911a)
 
