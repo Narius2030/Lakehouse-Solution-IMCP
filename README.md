@@ -6,7 +6,7 @@
 - [FastAPI-based Microservice](fastAPI-based-microservice)
 
 
-## 📌 Technologies Used
+## 📌 Tech Stack
 
 | Technology  | Purpose |
 |-------------|---------|
@@ -22,7 +22,7 @@
 | Resource       | Specification |
 |---------------|--------------|
 | **VPS OS**    | Ubuntu 24.0.2 |
-| **CPU**       | 4-core |
+| **CPU**       | 4-core Intel Xeon |
 | **GPU**       | ❌ No GPU |
 | **RAM**       | 10GB |
 | **Storage**   | 200GB SSD |
