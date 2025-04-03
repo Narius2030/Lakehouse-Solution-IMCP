@@ -1,9 +1,32 @@
 # References
 
-[General Architecture of Data Lake](general-architecture-of-data-lake)
-[Real-time Monitoring & Scheduling](real-time-monitoring-&-scheduling)
-[MLOps Cycle](mlops-cycle)
-[FastAPI-based Microservice](fastAPI-based-microservice)
+- [General Architecture of Data Lake](general-architecture-of-data-lake)
+- [Real-time Monitoring & Scheduling](real-time-monitoring-&-scheduling)
+- [MLOps Cycle](mlops-cycle)
+- [FastAPI-based Microservice](fastAPI-based-microservice)
+
+
+## 📌 Technologies Used
+
+| Technology  | Purpose |
+|-------------|---------|
+| **Spark Streaming** | Stream processing for ingesting |
+| **Apache Kafka** | Streaming event and data |
+| **Apache Airflow** | Workflows & scheduling tasks |
+| **MinIO & MongoDB** | Data Storage and Catalog |
+| **Trino** | Federated SQL queries & seamless integration with BI tools |
+| **Superset** | BI tool for business analytics |
+
+## 🖥️ Infrastructure
+
+| Resource       | Specification |
+|---------------|--------------|
+| **VPS OS**    | Ubuntu 24.0.2 |
+| **CPU**       | 4-core |
+| **GPU**       | ❌ No GPU |
+| **RAM**       | 10GB |
+| **Storage**   | 200GB SSD |
+| **Networking** | 1Gbps Bandwidth |
 
 # General Architecture of Data Lake
 
