@@ -1,9 +1,9 @@
 # References
 
-- [General Architecture of Data Lake](general-architecture-of-data-lake)
-- [Real-time Monitoring & Scheduling](real-time-monitoring-&-scheduling)
-- [MLOps Cycle](mlops-cycle)
-- [FastAPI-based Microservice](fastAPI-based-microservice)
+- [General Architecture of Data Lake](#general-architecture-of-data-lake)
+- [Real-time Monitoring & Scheduling](#real-time-monitoring-&-scheduling)
+- [MLOps Cycle](#mlops-cycle)
+- [FastAPI-based Microservice](#fastAPI-based-microservice)
 
 
 ## 📌 Tech Stack
