@@ -4,6 +4,7 @@ sys.path.append('./airflow')
 import hashlib
 import pandas as pd
 import polars as pl
+import functools
 import itertools
 import logging
 import time
@@ -48,7 +49,6 @@ def process_row(data, params, settings, genai):
                 # short_caption = TextOperator.caption_generator(genai, data['s3_url'], settings.GEMINI_PROMPT)
                 # temp['short_caption'] = short_caption
                 new_data.append(temp)
-                time.sleep(random.uniform(0.01, 0.05))
                 
             except Exception as e:
                 print(f"Error when uploading augmented image: {str(e)}")
@@ -61,11 +61,12 @@ def load_refined_data(params):
     affected_rows = 0
     latest_time = sql_opt.get_latest_fetching_time('silver', 'augmented_metadata')
     try:
-        for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=1000)):
+        for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=500)):
             datarows = list(batch)
             args = [(data, params, settings, genai) for data in tqdm(datarows)]
-            with cf.ThreadPoolExecutor(max_workers=3) as executor:
-                new_data = list(executor.map(lambda p: process_row(*p), args))
+            with cf.ProcessPoolExecutor(max_workers=2) as executor:
+                func = functools.partial(process_row)
+                new_data = list(executor.map(func, *zip(*args)))
                 
             # insert metadata
             new_data = list(itertools.chain(*new_data))
@@ -76,6 +77,7 @@ def load_refined_data(params):
             mongo_operator.insert_batches('refined', new_data)
             logging.info(f"SUCCESS WITH {len(new_data)} ROWS IN BATCH {batch_idx}")
             affected_rows += len(new_data)
+            time.sleep(random.uniform(0.001, 0.005))
             break
         # Write logs
         sql_opt.write_log('augmented_metadata', layer='silver', start_time=start_time, status="SUCCESS", action="insert", affected_rows=affected_rows)

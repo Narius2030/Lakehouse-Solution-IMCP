@@ -54,7 +54,7 @@ def load_encoded_data():
             "root_url": f"{settings.MINIO_URL}/encoded-data/{partition}", 
             "date": datetime.today()
         }
-        for batch in sql_opt.data_generator('refined', latest_time=latest_time, batch_size=10):
+        for batch in sql_opt.data_generator('refined', latest_time=latest_time, batch_size=500):
             encoded_data = []
             datarows = list(batch)
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")

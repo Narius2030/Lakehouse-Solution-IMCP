@@ -35,12 +35,7 @@ with DAG(
         count_existing_collection = TrinoOperator(
             task_id="check_collection_existence",
             trino_conn_id="trino_conn",
-            sql=f"""
-                SELECT COUNT(*) as count
-                FROM mongodb.information_schema.tables 
-                WHERE table_schema = 'imcp' 
-                AND table_name IN('audit','raw','refined','featured');
-            """,
+            sql="./sql/count_existing_collections.sql",
             do_xcom_push=True
         )
         check_existing_collection = PythonOperator(

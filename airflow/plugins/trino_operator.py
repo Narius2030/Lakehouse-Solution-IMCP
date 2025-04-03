@@ -50,7 +50,6 @@ class TrinoOperator(BaseOperator):
         if isinstance(self.sql, str) and self.sql.endswith('.sql'):
             if not os.path.exists(self.sql):
                 raise FileNotFoundError(f"SQL file not found: {self.sql}")
-
             with open(self.sql, 'r', encoding='utf-8') as f:
                 raw_sql = f.read()
         else:

@@ -1,6 +1,7 @@
 import io
 import cv2
 import time
+import logging
 import requests
 import numpy as np
 import albumentations as A
@@ -144,7 +145,5 @@ class ImageOperator():
                 
             return augmented_images
         except Exception as e:
-            print(f"Lỗi chi tiết khi xử lý ảnh")
-            print(f"Loại lỗi: {type(e).__name__}")
-            print(f"Nội dung lỗi: {str(e)}")
+            logging.error(f"Error in Augmenting: {str(e)}")
             return []

@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/opt/airflow')
+sys.path.append('./airflow')
 
 import logging
 from utils.setting import get_settings
