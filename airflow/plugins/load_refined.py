@@ -10,7 +10,6 @@ import logging
 import time
 import random
 import concurrent.futures as cf
-import google.generativeai as genai
 from tqdm import tqdm
 from utils.setting import get_settings
 from utils.operators.mongodb import MongoDBOperator
@@ -20,12 +19,11 @@ from utils.operators.image import ImageOperator
 
 
 settings = get_settings()
-genai.configure(api_key=settings.GEMINI_API_KEY)
 mongo_operator = MongoDBOperator('imcp', settings.DATABASE_URL)
 sql_opt = SQLOperators('imcp', settings)
 
 
-def process_row(data, params, settings, genai):
+def process_row(data, params, settings):
     new_data = []
     md5_hash = hashlib.md5(data["original_url"].encode()).hexdigest()
     image_name = f'{md5_hash}.jpg'
@@ -63,7 +61,7 @@ def load_refined_data(params):
     try:
         for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=500)):
             datarows = list(batch)
-            args = [(data, params, settings, genai) for data in tqdm(datarows)]
+            args = [(data, params, settings) for data in tqdm(datarows)]
             with cf.ProcessPoolExecutor(max_workers=2) as executor:
                 func = functools.partial(process_row)
                 new_data = list(executor.map(func, *zip(*args)))

@@ -102,7 +102,7 @@ class SQLOperators:
         except Exception as ex:
             raise Exception(f"====> Can't execute {query} - {str(ex)}")
         
-    def write_log(self, collection, status, layer, start_time=datetime.now(), end_time=datetime.now(), error_message="", affected_rows=0, action=""):
+    def write_log(self, collection, status, layer, start_time, error_message="", affected_rows=0, action=""):
         """write log data about each action interacting with database
 
         Args:
@@ -120,7 +120,7 @@ class SQLOperators:
                     "layer": layer,
                     "table_name": collection,
                     "start_time": start_time,
-                    "end_time": end_time,
+                    "end_time": datetime.now(),
                     "status": status,
                     "error_message": error_message,
                     "affected_rows": affected_rows,
