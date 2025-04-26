@@ -1,4 +1,5 @@
 import io
+import logging
 import requests
 import base64
 import time
@@ -129,6 +130,7 @@ def caption_generator(gemini_key, image_url, max_retries=3):
 
         except Exception as e:
             if attempt == max_retries - 1:
-                print(f"Error generating content: {e}")
+                logging.error(f"Error in generating caption: {e}")
+                # raise Exception(f"Error in generating --- {str(e)}")
                 return "Can't generate caption"
             time.sleep(2 * (attempt + 1)) 

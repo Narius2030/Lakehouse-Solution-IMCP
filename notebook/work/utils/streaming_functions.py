@@ -2,7 +2,6 @@ import sys
 sys.path.append("./work/imcp")
 
 import pyspark.sql.functions as F                                                       # type: ignore
-import pyspark.sql.types as T                                                           # type: ignore
 from utils.schema import minio_schema, image_schema, csv_schema
 from utils.udf_helpers import tokenize_vietnamese, upload_image, caption_generator, get_current_time
 
@@ -86,6 +85,16 @@ def csv_process_batch(df, batch_id, spark, db_uri, gemini_key):
         spark: SparkSession object.
         db_uri: MongoDB connection URI.
         gemini_key: API key for Gemini service.
+        
+    Returns:
+        None. Writes processed data to MongoDB collection.
+        
+    Process:
+        1. Read CSV file from S3 path
+        2. Clean and preprocess data
+        3. Tokenize and clean captions
+        4. Add upload status
+        5. Write to MongoDB raw collection
     """
     for row in df.collect():
         file_path = f"s3a://{row['Key']}"
@@ -101,6 +110,7 @@ def csv_process_batch(df, batch_id, spark, db_uri, gemini_key):
                   )
         
         df_cleaned = clean_caption(df_file, "short_caption")
+        df_cleaned = df_cleaned.withColumn("upload_status", F.lit("success"))
         (df_cleaned.write
                 .format("mongodb")
                 .option("spark.mongodb.write.connection.uri", db_uri)
@@ -112,14 +122,25 @@ def csv_process_batch(df, batch_id, spark, db_uri, gemini_key):
         )
         
 def mobile_process_batch(df, batch_id, spark, db_uri, gemini_key):
-    """Process micro-batch of mobile data and write to MongoDB.
+    """Process micro-batch of mobile image data and write to MongoDB.
     
     Args:
-        df: Input DataFrame with mobile data.
+        df: Input DataFrame with mobile image data.
         batch_id: ID of current batch.
         spark: SparkSession object.
         db_uri: MongoDB connection URI.
         gemini_key: API key for Gemini service.
+        
+    Returns:
+        None. Writes processed data to MongoDB collection.
+        
+    Process:
+        1. Format user data with metadata
+        2. Upload images and generate captions
+        3. Clean and validate captions
+        4. Read existing raw data schema
+        5. Select matching columns
+        6. Write to MongoDB user_data collection
     """
     formatted_df = format_user_data(df)
     formatted_df = (formatted_df.withColumn("upload_status", upload_image(F.col("image_base64"), F.col("image_name")))
@@ -127,13 +148,23 @@ def mobile_process_batch(df, batch_id, spark, db_uri, gemini_key):
                                 .drop("image_base64", "image_name", "image_size")
                    )
     df_cleaned = clean_caption(formatted_df, "short_caption")
-
-    (df_cleaned.write
+    
+    raw_df = (spark.read
                 .format("mongodb")
-                .option("spark.mongodb.write.connection.uri", db_uri)
-                .option("spark.mongodb.write.database", "imcp")
-                .option("spark.mongodb.write.collection", "user_data")
-                .option("spark.mongodb.write.batch.size", "10000")
-                .mode("append")
-                .save()
+                .option("spark.mongodb.read.connection.uri", db_uri)
+                .option("spark.mongodb.read.database", "imcp")
+                .option("spark.mongodb.read.collection", "raw")
+                .load()
+             )
+    table_columns = raw_df.columns[1:] + ["upload_status"]
+    final_df = df_cleaned.select(*table_columns)
+
+    (final_df.write
+        .format("mongodb")
+        .option("spark.mongodb.write.connection.uri", db_uri)
+        .option("spark.mongodb.write.database", "imcp")
+        .option("spark.mongodb.write.collection", "user_data")
+        .option("spark.mongodb.write.batch.size", "10000")
+        .mode("append")
+        .save()
     )
