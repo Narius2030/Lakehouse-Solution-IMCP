@@ -42,9 +42,9 @@ Detail Functional Layers
 
 # Real-time Monitoring & Scheduling
 
-Real-time Dashboard for ingested data
+Real-time Dashboard for Data Lake
 
-![imcp-eda-2025-04-03T13-49-10 351Z](https://github.com/user-attachments/assets/782f5867-8473-4c1f-8f0f-144c6fd78099)
+![imcp-eda-2025-04-12T10-15-45 213Z](https://github.com/user-attachments/assets/3fafa081-69c4-4b59-85a4-1ee59f4cebc6)
 
 Schedule tasks on Airflow
 
