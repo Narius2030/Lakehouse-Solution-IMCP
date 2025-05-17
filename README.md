@@ -59,7 +59,7 @@ Schedule tasks on Airflow
 > More detail in this [Repo](https://github.com/Narius2030/FastAPI-Microservice-IMCP.git)
 
 - **Query Data Service:** Develop an APIs to retrieve metadata and images which were normalized in Data Lake for automated incremental learning process.
-- **Model Deploying Service:** Develop an APIs to upload captured image and metadata of user to storage system for later usages and then activate model.
+- **Model Deploying Service:** Develop an APIs to deploy model run on vps, and obtain streaming captured image and metadata from mobile app to data lake for incremental learning.
 - Utilize Nginx to route and load balance among API service containers for **_reducing the latency_** and **_avoiding overload_** on each service.
 
 ![image](https://github.com/user-attachments/assets/88946be6-513e-4758-9ebe-11c1573c4c62)
