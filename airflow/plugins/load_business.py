@@ -24,9 +24,9 @@ minio_operator = MinioStorageOperator(endpoint=f'{settings.MINIO_HOST}:{settings
 
 
 
-def load_image_storage(file_name:str, partition:str):
+def load_image_storage(file_name:str, partition:str, catalog:dict):
     try:
-        minio_operator.upload_file('lakehouse', f'imcp/encoded-data/{partition}/{file_name}', f'{settings.EXTRACT_FEATURE_PATH}/{file_name}')
+        minio_operator.upload_file(catalog["s3_bucket"], f'{catalog["s3_object_path"]}/{partition}/{file_name}', f'{settings.EXTRACT_FEATURE_PATH}/{file_name}')
     except:
         raise Exception('Upload extracted feature file failed!')
     finally:
@@ -43,11 +43,18 @@ def process_row(row):
         "attention_mask": encoded_caption['attention_mask']
     }
 
-def load_encoded_data():
+def load_encoded_data(params):
     file_names = []
     affected_rows = 0
     start_time = pd.to_datetime('now')
     latest_time = sql_opt.get_latest_fetching_time('gold', 'encoded_data')
+    catalog = sql_opt.execute_query(query=f"""
+        SELECT * FROM imcp.layer_catalogs
+        WHERE layer_name = '{params["layer_name"]}'
+            AND storage_type = '{params["storage_type"]}'
+            AND s3_bucket = '{params["bucket_name"]}'
+    """)[0]
+    print(catalog)
     try:
         partition = datetime.now().strftime("%Y-%m-%d")
         metadata = {
@@ -65,7 +72,7 @@ def load_encoded_data():
             file_name = f"encoded_data_{timestamp}.pkl"
             with open(f"/opt/airflow/data/{file_name}", "wb") as f:
                 pickle.dump(encoded_data, f)
-            load_image_storage(file_name, partition)
+            load_image_storage(file_name, partition, catalog)
             
             print('SUCCESS with', len(datarows))
             affected_rows += len(datarows)
@@ -85,4 +92,10 @@ def load_encoded_data():
 
 
 if __name__=='__main__':
-    load_encoded_data() 
+    params = {
+        "bucket_name": "lakehouse",
+        "storage_type": "minio",
+        "layer_name": "featured"
+    }
+    
+    load_encoded_data(params) 

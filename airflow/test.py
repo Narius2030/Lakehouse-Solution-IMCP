@@ -1,4 +1,4 @@
-# from utils.operators.trinodb import SQLOperators
+from utils.operators.trinodb import SQLOperators
 # from utils.kafka_clients import Prod, Cons
 from utils.operators.image import ImageOperator
 from utils.setting import get_settings
@@ -9,7 +9,7 @@ import base64
 import time
 
 settings = get_settings()
-# sql_opt = SQLOperators('imcp', settings)
+sql_opt = SQLOperators('imcp', settings)
 
 
 def perform_imc(image_url):
@@ -44,15 +44,16 @@ def image_generator():
 
 
 if __name__ == "__main__":
-    # result = perform_imc("https://img.cand.com.vn/NewFiles/Images/2024/03/19/a-1710822064944.jpg")
-    # print("Image Caption: ", result)
+    query = """
+        SELECT * FROM imcp.layer_catalogs
+        WHERE layer_name = 'refined' 
+            AND storage_type = 'minio'
+            AND s3_bucket = 'lakehouse'
+    """
     
-    # producer = Prod(settings.KAFKA_ADDRESS, 'mobile-images', image_generator)
-    # producer.run()
+    data = sql_opt.execute_query(query)
+    print(data)
     
-    # consumer = Cons(settings.KAFKA_ADDRESS, 'test', 'read_image', read_image_from_kafka)
-    # consumer.run()
-    
-    image_array = ImageOperator.encode_image("http://images.cocodataset.org/val2017/000000399462.jpg")
-    print(image_array.keys())
-    print(image_array)
+    # image_array = ImageOperator.encode_image("http://images.cocodataset.org/val2017/000000399462.jpg")
+    # print(image_array.keys())
+    # print(image_array)

@@ -11,6 +11,7 @@ import time
 import random
 import concurrent.futures as cf
 from tqdm import tqdm
+from datetime import datetime
 from utils.setting import get_settings
 from utils.operators.mongodb import MongoDBOperator
 from utils.operators.trinodb import SQLOperators
@@ -23,16 +24,17 @@ mongo_operator = MongoDBOperator('imcp', settings.DATABASE_URL)
 sql_opt = SQLOperators('imcp', settings)
 
 
-def process_row(data, params, settings):
+def process_row(data, catalog, settings):
     new_data = []
     md5_hash = hashlib.md5(data["original_url"].encode()).hexdigest()
+    partition = datetime.now().strftime("%Y-%m-%d")
     image_name = f'{md5_hash}.jpg'
-    data['s3_url'] =  f'{settings.AUGMENTED_IMAGE_URL}/{image_name}'
+    data['s3_url'] =  f"{catalog['s3_path']}/{partition}/{image_name}"
 
     original_image, is_error = ImageOperator.image_from_url(data['original_url'])
     if is_error == False:
         ## TODO: Upload original image
-        ImageOperator.upload_image(original_image, image_name, params['bucket_name'], params['file_image_path'], settings)
+        ImageOperator.upload_image(original_image, image_name, catalog['s3_bucket'], f'{catalog["s3_object_path"]}/{partition}', settings)
         new_data.append(data)
         augmented_images = ImageOperator.augment_image(original_image)
 
@@ -41,11 +43,8 @@ def process_row(data, params, settings):
             try:
                 new_image_name = f'{md5_hash}_{aug_idx}.jpg'
                 ## TODO: Upload augmented image
-                ImageOperator.upload_image(aug_image, new_image_name, params['bucket_name'], params['file_image_path'], settings)
-                temp['s3_url'] = f'{settings.AUGMENTED_IMAGE_URL}/{new_image_name}'
-                # ## TODO: Generate caption
-                # short_caption = TextOperator.caption_generator(genai, data['s3_url'], settings.GEMINI_PROMPT)
-                # temp['short_caption'] = short_caption
+                ImageOperator.upload_image(aug_image, new_image_name, catalog['s3_bucket'], f'{catalog["s3_object_path"]}/{partition}', settings)
+                temp['s3_url'] = f"{catalog['s3_path']}/{partition}/{new_image_name}"
                 new_data.append(temp)
                 
             except Exception as e:
@@ -58,10 +57,18 @@ def load_refined_data(params):
     start_time = pd.to_datetime('now')
     affected_rows = 0
     latest_time = sql_opt.get_latest_fetching_time('silver', 'augmented_metadata')
+    catalog = sql_opt.execute_query(query=f"""
+        SELECT * FROM imcp.layer_catalogs
+        WHERE layer_name = '{params["layer_name"]}'
+            AND storage_type = '{params["storage_type"]}'
+            AND s3_bucket = '{params["bucket_name"]}'
+    """)[0]
+    print(catalog)
     try:
-        for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=500)):
+        for batch_idx, batch in enumerate(sql_opt.data_generator('raw', latest_time=latest_time, batch_size=5)):
             datarows = list(batch)
-            args = [(data, params, settings) for data in tqdm(datarows)]
+            # args = [(data, params, settings) for data in tqdm(datarows)]
+            args = [(data, catalog, settings) for data in tqdm(datarows)]
             with cf.ProcessPoolExecutor(max_workers=2) as executor:
                 func = functools.partial(process_row)
                 new_data = list(executor.map(func, *zip(*args)))
@@ -89,7 +96,8 @@ def load_refined_data(params):
 if __name__=='__main__':
     params = {
         "bucket_name": "lakehouse",
-        "file_image_path": "imcp/augmented-data/images"
+        "storage_type": "minio",
+        "layer_name": "refined"
     }
     
     load_refined_data(params)

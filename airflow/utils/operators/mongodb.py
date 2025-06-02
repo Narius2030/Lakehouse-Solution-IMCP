@@ -66,15 +66,18 @@ class MongoDBOperator():
         latest_time = data[0]['end_time']
         return latest_time
     
-    def build_query(self, params:dict):
+    def get_layer_catalog(self, collection:str, params:dict):
         query = {
-            "url": params['url'],
             "$and": [
-                {"caption": params['caption']},
-                {"short_caption": params['short_caption']}
+                {"layer_name": params['layer_name']},
+                {"bucket_name": params['bucket_name']},
+                {"storage_type": params['storage_type'],}
             ]
         }
-        return query
+        with pymongo.MongoClient(self.__connstr) as client:
+            db = client[self.dbname]
+            documents = db[collection].find(query, {})
+        return documents
     
     def data_generator(self, collection:str, batch_size:int=10000, limit:int=100000):
         """Generate any data by batch

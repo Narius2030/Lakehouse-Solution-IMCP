@@ -6,10 +6,9 @@ from airflow.utils.task_group import TaskGroup                                  
 from airflow.operators.python_operator import PythonOperator                                            #type: ignore
 from airflow.operators.dummy import DummyOperator                                                       #type: ignore
 from airflow.models.variable import Variable                                                            #type: ignore
-from trino_operator import TrinoOperator                                                                #type: ignore
 from load_augmented import load_refined_data                                                            #type: ignore
 from load_encoded import load_encoded_data                                                              #type: ignore
-from clean_staging import clean_null_data, check_collection_result, check_bucket_result                 #type: ignore
+from clean_staging import clean_null_data,                                                              #type: ignore
 
 
 # DAGs
@@ -30,35 +29,14 @@ with DAG(
     start = DummyOperator(task_id="start")
     end = DummyOperator(task_id="end")
     
-    # Validate Connection
-    with TaskGroup("validate_configs", tooltip="Tasks for validations before running") as validate_connections:
-        count_existing_collection = TrinoOperator(
-            task_id="check_collection_existence",
-            trino_conn_id="trino_conn",
-            sql="./sql/count_existing_collections.sql",
-            do_xcom_push=True
-        )
-        check_existing_collection = PythonOperator(
-            task_id='check_existing_collection',
-            python_callable=check_collection_result,
-            provide_context=True,
-            dag = dag
-        )
-        count_existing_collection >> check_existing_collection
-        
-        check_bucket = PythonOperator(
-            task_id='check_bucket',
-            python_callable=check_bucket_result,
-            dag = dag
-        )
-    
     # Silver process
     with TaskGroup("data_augmentation", tooltip="Tasks for augmenting images") as data_augmentation:
         augment_data = PythonOperator(
             task_id = 'augment_data',
             params = {
-                "bucket_name": Variable.get("LAKEHOUSE_BUCKET", default_var="lakehouse"),
-                "file_image_path": Variable.get("AUGMENTED_IMAGE_PATH", default_var="imcp/augmented-data/images")
+                "bucket_name": Variable.get("S3_BUCKET", default_var="lakehouse"),
+                "storage_type": Variable.get("STORAGE_TYPE", default_var="minio"),
+                "layer_name": Variable.get("REFINED_LAYER", default_var="refined")
             },
             python_callable = load_refined_data,
             trigger_rule='all_success',
@@ -78,12 +56,15 @@ with DAG(
     # Gold process
     encode_data = PythonOperator(
         task_id = 'encode_data',
+        params = {
+            "bucket_name": Variable.get("S3_BUCKET", default_var="lakehouse"),
+            "storage_type": Variable.get("STORAGE_TYPE", default_var="minio"),
+            "layer_name": Variable.get("FEATURED_LAYER", default_var="featured")
+        },
         python_callable = load_encoded_data,
         trigger_rule='all_success',
         dag = dag
     )
 
-
-
 # pipeline
-start >> validate_connections >> Label("augment") >> data_augmentation >> Label("encode") >> encode_data >> end
+start >> Label("augment") >> data_augmentation >> Label("encode") >> encode_data >> end

@@ -54,7 +54,7 @@ class MinioStorageOperator:
         Upload tệp lên MinIO.
 
         :param bucket_name: Tên bucket trong MinIO.
-        :param file_path: Đường dẫn đến tệp cần upload.
+        :param file_path: Đường dẫn đến thư mục cần upload.
         :param object_name: Tên đối tượng sẽ lưu trên MinIO.
         """
         try:
