@@ -40,11 +40,15 @@ Detail Functional Layers
 
 ![image](https://github.com/user-attachments/assets/da4c583d-70fd-440d-b2cc-9ab08cf92fd2)
 
+Metadata Layer
+
+![image](https://github.com/user-attachments/assets/ab8bc77a-6933-4d04-9e82-6330bd9ec50a)
+
 # Real-time Monitoring & Scheduling
 
-Real-time Dashboard for Data Lake
+Monitoring Dashboard for Data Lake
 
-![imcp-eda-2025-04-12T10-15-45 213Z](https://github.com/user-attachments/assets/3fafa081-69c4-4b59-85a4-1ee59f4cebc6)
+![dashboard](https://github.com/user-attachments/assets/5972e554-78b7-478f-a123-188aeb8ae52d)
 
 Schedule tasks on Airflow
 
