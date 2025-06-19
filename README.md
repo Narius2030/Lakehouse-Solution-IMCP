@@ -28,13 +28,13 @@
 | **Storage**   | 200GB SSD |
 | **Networking** | 1Gbps Bandwidth |
 
-# General Architecture of Data Lake
+# General Architecture of MLOps
 
 - Builded a Data Lake following Medallion architecture with `catalog layer` and `storage layer` for storing image and its metadata
 - Streamed events from `file uploading` and `captured images` from mobile app (was sent by API) into raw storage area, so that it helps data more various for AI training
 - Integrated NLP and Image processings in ETL pipeline to periodically normalize images and metadata
 
-![image](https://github.com/user-attachments/assets/00a49f5d-af81-43ed-b105-cde56329c584)
+![image](https://github.com/user-attachments/assets/4fe5b22b-c85e-40f5-a50b-a3284f369536)
 
 Detail Functional Layers
 
@@ -53,10 +53,6 @@ Monitoring Dashboard for Data Lake
 Schedule tasks on Airflow
 
 ![image](https://github.com/user-attachments/assets/d77acb2e-6420-4577-81a8-6496c7f2ea77)
-
-# MLOps Cycle
-
-![image](https://github.com/user-attachments/assets/36a027c6-1eaa-4344-b695-3fff5b9583c6)
 
 # FastAPI-based Microservice
 
