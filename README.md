@@ -36,10 +36,6 @@
 
 ![image](https://github.com/user-attachments/assets/4fe5b22b-c85e-40f5-a50b-a3284f369536)
 
-Detail Functional Layers
-
-![image](https://github.com/user-attachments/assets/da4c583d-70fd-440d-b2cc-9ab08cf92fd2)
-
 Metadata Layer
 
 ![image](https://github.com/user-attachments/assets/ab8bc77a-6933-4d04-9e82-6330bd9ec50a)
